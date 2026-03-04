@@ -46,7 +46,7 @@ run('Gen_fuzzy_file.m');
 Info.Cv_method      = 'eta';            % three control-variable methods: 'eta', 'du', 'u'
 Info.Cp_method      = 'adaptive';       % three cost-parameter methods: 'adaptive', 'zero', 'one'
 Info.En_chanceCons  = true;             % enable to use chance constraints?
-Info.En_default     = false;             % enable to use default initial values (s_ct0,r_tc0,w_ti0)?
+Info.En_default     = true;             % enable to use default initial values (s_ct0,r_tc0,w_ti0)?
 Info.En_varNeps     = false;            % enable to vary parameters (N,epsilon)?
 Info.En_rndShuffle  = false;            % enable rng('shuffle')?
 Info.En_RT_figure   = true;             % enable to plot real-time figure?
