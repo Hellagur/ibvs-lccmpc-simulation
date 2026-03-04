@@ -1,4 +1,20 @@
+%% DEFINE CHANCE CONSTRAINTS
 function bd = Define_chance_cons(Ac, D, Rd, alpha)
+% Compute probabilistic constraint tightening for chance constraints
+%
+% This function calculates the tightening term for state constraints to
+% handle disturbances with known covariance. It projects the disturbance
+% effect onto each constraint and applies conservative tightening based on
+% the specified confidence level alpha.
+%
+% Inputs:
+%   Ac    - constraint matrix for state bounds
+%   D     - disturbance transition matrix
+%   Rd    - disturbance covariance matrix
+%   alpha - confidence parameter (probability level)
+%
+% Outputs:
+%   bd    - tightening vector added to constraint bounds
 
     % Extract disturbance dimension and prediction horizon
     n  = size(Rd, 1);             % State dimension

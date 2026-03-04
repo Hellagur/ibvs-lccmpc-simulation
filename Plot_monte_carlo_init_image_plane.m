@@ -1,5 +1,17 @@
-%% Plot initial image plane
+%% PLOT MONTE CARLO INITIAL IMAGE PLANE
 function Plot_monte_carlo_init_image_plane(s0_all, N)
+% Plot Monte Carlo initial feature positions in image plane
+%
+% This function visualizes the initial distribution of feature points in the
+% image plane from Monte Carlo simulations.
+%
+% Inputs:
+%   s0_all - initial feature positions (8×N)
+%   N      - number of samples
+%
+% Outputs:
+%   None (displays figure)
+
     fig = figure('Units','inches', ...
                  'Position',[1 1 8 6], ...
                  'PaperOrientation', 'landscape');
@@ -27,11 +39,6 @@ function Plot_monte_carlo_init_image_plane(s0_all, N)
              'YData', [s0(2:2:8); s0(2)], ...
              'Color', [120,120,120]/255)
     end
-
-    % scatter(sd(1), sd(2), 80, 'filled', 's', 'MarkerFaceColor', 'r');
-    % scatter(sd(3), sd(4), 80, 'filled', 's', 'MarkerFaceColor', 'g');
-    % scatter(sd(5), sd(6), 80, 'filled', 's', 'MarkerFaceColor', 'b');
-    % scatter(sd(7), sd(8), 80, 'filled', 's', 'MarkerFaceColor', 'y');
 
     line([um, um, -um, -um, um], ...
          [-nm, nm, nm, -nm, -nm], ...

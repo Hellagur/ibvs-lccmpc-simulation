@@ -1,9 +1,23 @@
+%% PLOT RELATIVE POSE ERROR COMPARE
 function fig = Plot_relative_pose_error_compare(file1, file2, file3)
-    
+% Compare relative pose errors across different gamma methods
+%
+% This function loads simulation results for three different gamma settings
+% and plots the relative position and attitude errors over time.
+%
+% Inputs:
+%   file1 - path to gamma adaptive results
+%   file2 - path to gamma=0 results
+%   file3 - path to gamma=1 results
+%
+% Outputs:
+%   fig - figure handle
+
     data1 = load(file1);
     hist1 = data1.hist;
     param = data1.param;
     tspan = 0:param.ts:param.ts*param.Tsteps;
+
 
     data2 = load(file2);
     hist2 = data2.hist;
@@ -21,34 +35,41 @@ function fig = Plot_relative_pose_error_compare(file1, file2, file3)
     r_ct_t3 = zeros(3, param.Tsteps+1);  % Relative position in target frame
     s_ct3   = zeros(3, param.Tsteps+1);  % Relative attitude (MRPs)
 
-    %% ---- Compute relative position ----
+    %% Compute relative position
     for i = 1:param.Tsteps+1
         R_tl = hist1.R_ti{i} * hist1.R_li{i}';     % DCM from LVLH to target frame
         R_ts = hist1.R_ti{i} * hist1.R_si{i}';
         r_ct_t1(:,i) = R_tl * hist1.xl(7:9,i) + R_ts * param.r_sc;
 
+
         R_tl = hist2.R_ti{i} * hist2.R_li{i}';     % DCM from LVLH to target frame
         R_ts = hist2.R_ti{i} * hist2.R_si{i}';
         r_ct_t2(:,i) = R_tl * hist2.xl(7:9,i) + R_ts * param.r_sc;
+
 
         R_tl = hist3.R_ti{i} * hist3.R_li{i}';     % DCM from LVLH to target frame
         R_ts = hist3.R_ti{i} * hist3.R_si{i}';
         r_ct_t3(:,i) = R_tl * hist3.xl(7:9,i) + R_ts * param.r_sc;
     end
 
+
     r_ct_d = [0; 0; -5];
+
 
     r_ct_tn1 = vecnorm(r_ct_t1 - r_ct_d);
     r_ct_tn2 = vecnorm(r_ct_t2 - r_ct_d);
     r_ct_tn3 = vecnorm(r_ct_t3 - r_ct_d);
 
+
     r_ct_end1 = norm(r_ct_t1(:,end) - r_ct_d);
     r_ct_end2 = norm(r_ct_t2(:,end) - r_ct_d);
     r_ct_end3 = norm(r_ct_t3(:,end) - r_ct_d);
 
+
     fprintf("terminal postion error: %f, %f, %f\n", r_ct_end1, r_ct_end2, r_ct_end3);
 
-    %% ---- Compute relative attitude (MRPs) ----
+
+    %% Compute relative attitude (MRPs)
     for i = 1:param.Tsteps+1
         R_ct = hist1.R_ci{i} * hist1.R_ti{i}';      % DCM from target to chaser
         s_ct1(:,i) = dcm2mrp(R_ct);                 % Convert DCM to MRP
@@ -60,20 +81,24 @@ function fig = Plot_relative_pose_error_compare(file1, file2, file3)
         s_ct3(:,i) = dcm2mrp(R_ct);                 % Convert DCM to MRP
     end
 
+
     s_ctn1 = vecnorm(s_ct1);
     s_ctn2 = vecnorm(s_ct2);
     s_ctn3 = vecnorm(s_ct3);
+
 
     s_ctd = [0;0;0];
     s_ct_end1 = norm(s_ct1(:,end) - s_ctd);
     s_ct_end2 = norm(s_ct2(:,end) - s_ctd);
     s_ct_end3 = norm(s_ct3(:,end) - s_ctd);
 
+
     fprintf("terminal attitude error: %f, %f, %f\n", s_ct_end1, s_ct_end2, s_ct_end3);
+
 
     fig = figure('Units','inches','Position',[1 1 8 6]);
 
-    %% position
+    %% Position
     subplot(211); hold on;
     plot(tspan, r_ct_tn1, 'r', 'DisplayName', '$\gamma$ Adaptive', 'LineWidth', 1.5);
     plot(tspan, r_ct_tn3, 'b--', 'DisplayName', '$\gamma \equiv 1$', 'LineWidth', 1.5);
@@ -113,9 +138,9 @@ function fig = Plot_relative_pose_error_compare(file1, file2, file3)
     set(gca,'FontSize',10,'FontName','Times New Roman');
     ax_inset_xyz.YAxis.Exponent = 0;
     grid on; axis tight;
-    
 
-    %% attitude
+
+    %% Attitude
     subplot(212); hold on;
     plot(tspan, s_ctn1, 'r', 'DisplayName', '$\gamma$ Adaptive', 'LineWidth', 1.5);
     plot(tspan, s_ctn3, 'b--', 'DisplayName', '$\gamma \equiv 1$', 'LineWidth', 1.5);
@@ -147,6 +172,6 @@ function fig = Plot_relative_pose_error_compare(file1, file2, file3)
     set(gca,'FontSize',10,'FontName','Times New Roman');
     ax_inset_xyz.YAxis.Exponent = 0;
     grid on; axis tight;
-    yticks(0.01:0.04:0.13)
-
+    yticks(0.01:0.04:0.13);
+    
 end

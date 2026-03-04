@@ -1,29 +1,21 @@
+%% PLOT RELATIVE MOTION TRAJECTORY
 function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
-%PLOT_RELATIVE_MOTION_TRAJECTORY
-%   Plot the relative motion trajectory of a chaser spacecraft with respect
-%   to a target in LVLH (Local Vertical Local Horizontal) frame. The function
-%   includes 3D visualization of:
-%     - Target attitude axes
-%     - Chaser trajectory and body axes
-%     - Target feature points and planes
-%     - Time labels
-%     - Inset subplots for feature point motion and terminal state
+% Plot 3D relative motion trajectory in LVLH frame
 %
-% INPUTS:
-%   param   - struct containing system parameters, e.g.,
-%             param.ts: sampling time
-%             param.xi: 3D positions of target feature points
-%   hist    - struct containing simulation history, including:
-%             hist.R_ti: target rotation matrices in inertial frame (cell array)
-%             hist.R_li: LVLH rotation matrices (cell array)
-%             hist.R_ci: chaser rotation matrices in inertial frame (cell array)
-%             hist.R_cl: chaser rotation matrices in LVLH frame (cell array)
-%             hist.xl  : state vector history, including chaser position
+% This function visualizes the relative motion trajectory of a chaser spacecraft
+% with respect to a target in the LVLH (Local Vertical Local Horizontal) frame.
+% It includes 3D visualization of target attitude axes, chaser trajectory and
+% body axes, target feature points and planes, time labels, and inset subplots
+% for feature point motion and terminal state.
+%
+% Inputs:
+%   param   - structure containing system parameters (ts, xi)
+%   hist    - structure containing simulation history (R_ti, R_li, R_ci, R_cl, xl)
 %   k       - current timestep or total number of timesteps
-%   saveFig - boolean, whether to export the figure as a PDF
+%   saveFig - boolean, whether to export the figure as PDF
 %
-% OUTPUT:
-%   None (plots are displayed and optionally saved as PDF)
+% Outputs:
+%   fig - figure handle
 
     % === Define standard coordinate axes ===
     x = [1;0;0]; y = [0;1;0]; z = [0;0;1];
@@ -50,6 +42,7 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
         y_lc(:,i) = R_cl' * y;
         z_lc(:,i) = R_cl' * z;
     end
+
 
     % Chaser position history
     r_l = hist.xl(7:9,:);
@@ -90,6 +83,7 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
         Plot_camera_axes(pos', hist.R_cl{i}', 2.0, [0.2 0.6 1.0], 0.15);
     end
 
+
     % === Plot chaser trajectory and body axes ===
     for i = idx_array
         pos = (r_l(:,i) + hist.R_sl{i}' *param.r_sc)';
@@ -99,8 +93,10 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
         Plot_arrow3D(pos, pos + 1.5 * z_lc(:,i)', color_axes(3,:), alpha_vals(i));
     end
 
+
     % === Plot trajectory line ===
     plot3(r_l(1,:), r_l(2,:), r_l(3,:), 'Color', 'k', 'LineWidth', 1.5);
+
 
     %% === Plot feature planes and points ===
     xi_l = zeros(3,4);  % feature points positions
@@ -109,6 +105,7 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
         if i == 1, idx = 1; end
         if i >= 2, idx = 2; end
         if i == k, idx = 3; end
+
 
         % Plot feature points
         R_tl = hist.R_ti{i}*hist.R_li{i}';
@@ -119,11 +116,13 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
                      'MarkerFaceAlpha', 0.5, 'MarkerEdgeAlpha', 1.0, 'LineWidth', 0.5);
         end
 
+
         % Plot target plane
         patch('Parent', ax_main, 'Vertices', xi_l', 'Faces', [1 2 3 4], ...
               'FaceColor', 'interp', 'FaceVertexCData', repmat(color_patch(idx,:), 4, 1), ...
               'FaceAlpha', 0.25, 'EdgeColor', 'black');
     end
+
 
     % Plot terminal light rays from chaser to feature points
     for i = 1:4
@@ -131,11 +130,13 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
              'Color', color_point(i,:), 'LineStyle', '--', 'LineWidth', 0.75);
     end
 
+
     % === Axis labels ===
     xlabel('$x_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
     ylabel('$y_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
     zlabel('$z_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
     set(ax_main, 'FontSize', 12, 'FontName', 'Times New Roman');
+
 
     % === Legend handles ===
     h_plane_init = patch(NaN, NaN, NaN, [0 0 1], 'FaceAlpha', 0.25, 'EdgeColor', 'black', 'DisplayName', 'Initial Feature Plane');
@@ -148,15 +149,18 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
     legend(ax_main, [h_plane_init, h_plane_medt, h_plane_term, h_traj, hx, hy, hz], ...
            'Location', 'northeast', 'Interpreter', 'latex', 'FontSize', 10, 'Box', 'on');
 
+
     %% === Inset subplot: Feature point motion ===
     ax_fp = axes('Position', [0.60, 0.55, 0.38, 0.38]);
     hold(ax_fp, 'on'); view(ax_fp, 3);
     plot_feature_point_motion_subplot(ax_fp, param, hist, k);
 
+
     %% === Inset: Terminal state ===
     r_c = hist.R_sl{k}' *param.r_sc;
     ax_term = axes('Position', [0.60, 0.10, 0.38, 0.38]);
     plot_inset_state(ax_term, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_ls, z_ls, x_lc, y_lc, z_lc, k, alpha_vals, true);
+
 
     %% === Export figure as PDF if requested ===
     if saveFig == true
@@ -167,27 +171,29 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
     end
 end
 
-%% Plot target feature point motion in a subplot
-function plot_feature_point_motion_subplot(ax, param, hist, k)
-% plot_feature_point_motion_subplot
-%   Plots the motion of the target feature points over time in a 3D inset.
-%   Shows initial and terminal positions, intermediate planes, and feature point trajectories.
+%% PLOT FEATURE POINT MOTION SUBPLOT
+% Plot target feature point motion in a subplot
 %
-% INPUTS:
+% Plots the motion of target feature points over time in a 3D inset.
+% Shows initial and terminal positions, intermediate planes, and trajectories.
+%
+% Inputs:
 %   ax    - axes handle to draw the subplot
-%   param - struct containing system parameters (param.xi: target feature points)
+%   param - struct containing system parameters (xi: target feature points)
 %   hist  - struct containing rotation matrices and state history
 %   k     - total number of timesteps
 %
-% OUTPUT:
+% Outputs:
 %   None (plots added to specified axes)
 
+function plot_feature_point_motion_subplot(ax, param, hist, k)
     % === Define feature point colors ===
     color_axes  = [1 0 0; 0 1 0; 0 0 1];
     color_point = [231 76 60; 46 204 113; 52 152 219; 241 196 15]/255;
     color_patch = [0 0 1; 204/255 255/255 204/255; 1 0 0];
     color_edge  = [0 0 1; 102/255 255/255 153/255; 1 0 0];
     alpha_vals  = linspace(0.3, 0.5, k);
+
 
     % === Rotation axes in LVLH frame ===
     x = [1;0;0]; y = [0;1;0]; z = [0;0;1];
@@ -201,6 +207,7 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
         z_lt(:,i) = R_tl' * z;
     end
 
+
     % === Plot plane center trajectory ===
     ave_xi = [];
     for i = 1:k
@@ -211,24 +218,27 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
         ave_xi = [ave_xi, mean(xi_l,2)];
     end
 
+
     % plot plane center trajectory
     plot3(ave_xi(1,:), ave_xi(2,:), ave_xi(3,:), 'k--', 'LineWidth', 1.0);
+
 
     % === draw direction arrows ===
     dx = diff(ave_xi(1,:));
     dy = diff(ave_xi(2,:));
     dz = diff(ave_xi(3,:));
     
-    % 每隔 N 个点画一个箭头（防止太密）
+    % Plot arrow every N points (prevent overcrowding)
     N_arrow = 15;
     idx = 1:N_arrow:length(dx);
     
     quiver3(ave_xi(1,idx), ave_xi(2,idx), ave_xi(3,idx), ...
             dx(idx), dy(idx), dz(idx), ...
-            0.5, ...              % 缩放因子（0 表示不自动缩放）
+            0.5, ...              % Scale factor (0 means no auto-scaling)
             'k', ...
             'LineWidth', 1.2, ...
             'MaxHeadSize', 1.0);
+
 
     % === Plot feature planes (subset of timesteps) ===
     xi_l = zeros(3,4);
@@ -237,6 +247,7 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
         if i == 1, idx = 1; end
         if i >= 2, idx = 2; end
         if i == k, idx = 3; end
+
 
         % plot feature points on this plane
         R_tl = hist.R_ti{i} * hist.R_li{i}';
@@ -262,6 +273,7 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
                 'LineWidth', 1.0);
     end
 
+
     % === Plot target axes at start and end ===
     for i = [1, k]
         start = zeros(1,3);
@@ -271,20 +283,22 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
     end
     plot3(start(1), start(2), start(3), 'ko', 'MarkerSize',8, 'MarkerFaceColor','k');
 
+
     % === Set axes properties ===
     axis(ax, 'equal'); grid(ax, 'on');
     set(ax, 'FontSize', 12, 'FontName', 'Times New Roman');
 end
 
-%% Plot a small inset showing the target and chaser state
-function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_ls, z_ls, x_lc, y_lc, z_lc, idx, alpha_vals, is_terminal)
-% plot_inset_state
-%   Plots a 3D inset of the target and chaser state at a given timestep.
-%   Shows target axes, chaser axes, feature points, and the connection lines.
+
+%% PLOT INSET STATE
+% Plot a small inset showing the target and chaser state
 %
-% INPUTS:
+% Plots a 3D inset of the target and chaser state at a given timestep.
+% Shows target axes, chaser axes, feature points, and connection lines.
+%
+% Inputs:
 %   ax         - axes handle for plotting the inset
-%   param      - struct containing system parameters (e.g., param.xi: target feature points)
+%   param      - struct containing system parameters (xi: target feature points)
 %   hist       - struct containing rotation matrices and state history
 %   r_l        - chaser position history (3 x k)
 %   r_c        - camera relative position in LVLH 
@@ -293,15 +307,18 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
 %   x_lc, y_lc, z_lc - camera LVLH axes (3 x k)
 %   idx        - timestep index to plot
 %   alpha_vals - transparency values for target axes
-%   is_terminal- boolean, true if this is a terminal state inset (for coloring)
+%   is_terminal- boolean, true if this is a terminal state inset
 %
-% OUTPUT:
+% Outputs:
 %   None (plots are added to the provided axes)
 
+function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_ls, z_ls, x_lc, y_lc, z_lc, idx, alpha_vals, is_terminal)
     hold(ax, 'on'); view(ax, 3); grid(ax, 'on'); axis(ax, 'equal');
+
 
     % === Define colors for axes ===
     colorX = [1 0 0]; colorY = [0 1 0]; colorZ = [0 0 1];
+
 
     % === Plot target axes at LVLH origin ===
     start = zeros(1,3);  % LVLH origin
@@ -309,6 +326,7 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
     Plot_arrow3D(start, start + 1.5 * y_lt(:,idx)', colorY, alpha_vals(idx));
     Plot_arrow3D(start, start + 1.5 * z_lt(:,idx)', colorZ, alpha_vals(idx));
     plot3(ax, start(1), start(2), start(3), 'ko', 'MarkerSize', 3, 'MarkerFaceColor', 'k');  % origin marker
+
 
     % === Plot chaser body axes at its position ===
     start = r_l(:,idx)';  % chaser position
@@ -320,11 +338,13 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
     Plot_camera_model(start', hist.R_cl{idx}', 15.0);
     Plot_camera_axes(start', hist.R_cl{idx}', 2.0, [0.2 0.6 1.0], 0.15);
     
+    
     % === Plot camera body axes at its position ===
     start = r_l(:,idx)' + r_c';  % camera position
     Plot_arrow3D(start, start + 1.5 * x_lc(:,idx)', colorX, 1.0);
     Plot_arrow3D(start, start + 1.5 * y_lc(:,idx)', colorY, 1.0);
     Plot_arrow3D(start, start + 1.5 * z_lc(:,idx)', colorZ, 1.0);
+    
     
     % === Rotate target feature points to LVLH frame ===
     R_tl = hist.R_ti{idx} * hist.R_li{idx}';
@@ -334,6 +354,7 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
     xi_4 = R_tl' * param.xi(10:12);
     xi = [xi_1'; xi_2'; xi_3'; xi_4'];
 
+
     % === Plot target feature plane ===
     % Color red for terminal, blue for non-terminal
     patch('Parent', ax, 'Vertices', xi, 'Faces', [1 2 3 4], ...
@@ -341,9 +362,11 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
           'FaceVertexCData', repmat(is_terminal * [1 0 0] + ~is_terminal * [0 0 1], 4, 1), ...
           'FaceAlpha', 0.25, 'EdgeColor', 'black');
 
+
     % === Plot feature points and connecting lines to chaser ===
     color_set = [[231 76 60]/255; [46 204 113]/255; [52 152 219]/255; [241 196 15]/255];
     marker_style = 'o';  % marker shape for feature points
+
 
     for j = 1:4
         % Plot each feature point
@@ -352,8 +375,8 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
         line([start(1), xi(j,1)], [start(2), xi(j,2)], [start(3), xi(j,3)], ...
              'Color', color_set(j,:), 'LineStyle', '--', 'LineWidth', 0.5, 'Parent', ax);
     end
-
+    
+    
     % === Set axes properties ===
     set(ax, 'FontSize', 12, 'FontName', 'Times New Roman');
 end
-

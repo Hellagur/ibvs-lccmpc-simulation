@@ -1,23 +1,22 @@
+%% PLOT 3D ARROW
 function Plot_arrow3D(start_pt, end_pt, color, alpha, width, head_length)
-%PLOT_ARROW3D   Draw a 3D directional arrow between two points.
+% Draw a 3D directional arrow between two points
 %
 % This function draws a smooth 3D arrow (shaft + cone head) between 
-% the specified start and end points, which can be used to visualize 
-% directions, forces, velocities, or camera frames in space.
+% the specified start and end points for visualizing directions, forces,
+% velocities, or camera frames in space.
 %
 % Inputs:
-%   start_pt     — 1×3 vector, arrow start point [x, y, z].
-%   end_pt       — 1×3 vector, arrow end point [x, y, z].
-%   color        — 1×3 RGB vector specifying arrow color, e.g., [0, 0, 1].
-%   alpha        — scalar in [0,1], transparency level (1 = opaque).
-%   width        — (optional) shaft radius (default: 0.05).
-%   head_length  — (optional) cone head length (default: 0.2).
+%   start_pt    - 1×3 arrow start point [x, y, z]
+%   end_pt     - 1×3 arrow end point [x, y, z]
+%   color      - 1×3 RGB arrow color
+%   alpha      - scalar in [0,1], transparency level
+%   width      - shaft radius (default: 0.05)
+%   head_length - cone head length (default: 0.2)
 %
-% Example:
-%   Plot_arrow3D([0,0,0], [1,1,1], [1,0,0], 0.8, 0.03, 0.15);
+% Outputs:
+%   None (displays in current axes)
 
-
-    % Default parameters
     if nargin < 5, width = 0.05; end
     if nargin < 6, head_length = 0.2; end
 
@@ -30,14 +29,14 @@ function Plot_arrow3D(start_pt, end_pt, color, alpha, width, head_length)
     % Define shaft length (excluding the cone head)
     shaft_len = L - head_length;
     
-    %% ========== Draw Shaft (Cylinder) ==========
+    % Draw shaft (cylinder)
     % Create cylinder mesh (radius = width, height = shaft_len)
     [xc, yc, zc] = cylinder(width, 12);
     zc = zc * shaft_len;
 
     % Convert surface mesh to patch format for 3D transformation
     shaft = surf2patch(xc, yc, zc);
-
+    
     % Rotate and translate the shaft to align with direction vector
     shaft_verts = transform_arrow(shaft.vertices, dir, start_pt);
 
@@ -45,7 +44,7 @@ function Plot_arrow3D(start_pt, end_pt, color, alpha, width, head_length)
     patch('Faces', shaft.faces, 'Vertices', shaft_verts, ...
           'FaceColor', color, 'EdgeColor', 'none', 'FaceAlpha', alpha);
 
-    %% ========== Draw Head (Cone) ==========
+    % Draw head (cone)
     % Create cone mesh (base radius = 2×shaft width)
     [xh, yh, zh] = cylinder([width*2.0, 0], 12);
     zh = zh * head_length;
@@ -61,21 +60,20 @@ function Plot_arrow3D(start_pt, end_pt, color, alpha, width, head_length)
           'FaceColor', color, 'EdgeColor', 'none', 'FaceAlpha', alpha);
 end
 
-
+%% TRANSFORM ARROW
 function verts_out = transform_arrow(verts, direction, origin)
-%TRANSFORM_ARROW Rotate and translate arrow vertices to align with a given direction.
+% Rotate and translate arrow vertices to align with a given direction
 %
 % This helper function aligns the 3D geometry of the arrow 
-% (originally along the z-axis) with an arbitrary direction vector 
-% and translates it to the specified origin.
+% (originally along the z-axis) with an arbitrary direction vector.
 %
 % Inputs:
-%   verts     — Nx3 vertex matrix of the object (in local coordinates).
-%   direction — 3×1 unit vector specifying desired arrow direction.
-%   origin    — 1×3 vector, new origin of the arrow base.
+%   verts     - Nx3 vertex matrix of the object
+%   direction - 3×1 unit vector specifying desired arrow direction
+%   origin    - 1×3 new origin of the arrow base
 %
-% Output:
-%   verts_out — Nx3 transformed vertices in world coordinates.
+% Outputs:
+%   verts_out - Nx3 transformed vertices in world coordinates
 
     % Normalize the direction vector
     z = [0 0 1]';

@@ -1,27 +1,41 @@
-% 创建 Sugeno 类型 FIS
+%% FUZZY INFERENCE SYSTEM GENERATION
+% Create Sugeno-type FIS for gamma adjustment
+%
+% This script generates a fuzzy inference system (FIS) for adaptive gamma
+% adjustment in spacecraft rendezvous control. The fuzzy system maps
+% position error (Sv) and angular velocity error (Sw) to a weighting factor
+% gamma that adjusts the terminal cost in the MPC framework.
+%
+% Inputs:
+%   None (parameters are hardcoded)
+%
+% Outputs:
+%   gamma_adjuster.fis - generated fuzzy inference system file
+
+% Create Sugeno-type FIS
 fis = sugfis('Name', 'gamma_adjuster');
 
-% 添加输入变量: v_err
+% Add input variable: v_err (position error)
 fis = addInput(fis, [0.2 0.5], 'Name', 'v_err');
 fis = addMF(fis, 'v_err', 'trimf', [0.2 0.2 0.35], 'Name', 'Low'   , 'VariableType', 'input');
 fis = addMF(fis, 'v_err', 'trimf', [0.2 0.35 0.5], 'Name', 'Medium', 'VariableType', 'input');
 fis = addMF(fis, 'v_err', 'trimf', [0.35 0.5 0.5], 'Name', 'High'  , 'VariableType', 'input');
 
-% 添加输入变量: w_err
+% Add input variable: w_err (angular velocity error)
 fis = addInput(fis, [0.045 0.095], 'Name', 'w_err');
 fis = addMF(fis, 'w_err', 'trimf', [0.045 0.045 0.07], 'Name', 'Low'   , 'VariableType', 'input');
 fis = addMF(fis, 'w_err', 'trimf', [0.045 0.07 0.095], 'Name', 'Medium', 'VariableType', 'input');
 fis = addMF(fis, 'w_err', 'trimf', [0.07 0.095 0.095], 'Name', 'High'  , 'VariableType', 'input');
 
-% 添加输出变量: gamma
+% Add output variable: gamma
 fis = addOutput(fis, [0 1], 'Name', 'gamma');
-fis = addMF(fis, 'gamma', 'linear', [0 0 0], 'Name', 'VeryLow');  % 示例: 0*v + 0*w + 0
-fis = addMF(fis, 'gamma', 'linear', [0.5 0.3 0.1], 'Name', 'Low'); % a=0.5 (v强影响), b=0.3 (w中), c=0.1
+fis = addMF(fis, 'gamma', 'linear', [0 0 0], 'Name', 'VeryLow');  % Example: 0*v + 0*w + 0
+fis = addMF(fis, 'gamma', 'linear', [0.5 0.3 0.1], 'Name', 'Low'); % a=0.5 (v strong), b=0.3 (w medium), c=0.1
 fis = addMF(fis, 'gamma', 'linear', [1.0 0.5 0.5], 'Name', 'Medium');
-fis = addMF(fis, 'gamma', 'linear', [1.5 1.0 0.75], 'Name', 'High'); % 调系数以匹配逻辑，高值偏1
+fis = addMF(fis, 'gamma', 'linear', [1.5 1.0 0.75], 'Name', 'High'); % Adjust coefficients to match logic, high偏向1
 
-% 添加规则: [input1 input2 output weight operator]，operator=1 为 AND
-rules = [...
+% Add rules: [input1 input2 output weight operator], operator=1 is AND
+rules = [
     1 1 1 1 1;  % Low v, Low w -> Low
     1 2 1 1 1;  % Low v, Med w -> Low
     1 3 2 1 1;  % Low v, High w -> Med
@@ -34,13 +48,13 @@ rules = [...
 ];
 fis = addRule(fis, rules);
 
-% 保存 FIS 文件
+% Save FIS file
 writeFIS(fis, 'gamma_adjuster.fis');
 
-%% 绘图
+%% Plotting
 showplot = false;
 
-%% 绘图
+%% Plotting
 if showplot
     figure;
     subplot(211);
@@ -102,10 +116,10 @@ if showplot
         'LineWidth',1);
 end
 
-%% 可选: 查看 FIS 结构
+%% Optional: View FIS structure
 if showplot
     figure;
-    gensurf(fis);  % 查看输出表面（3D 图，检查平滑性）
+    gensurf(fis);  % View output surface (3D plot, check smoothness)
     set(gca, ...
         'FontName', 'Times New Roman', ...
         'FontSize', 12, ...

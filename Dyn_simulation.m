@@ -1,6 +1,6 @@
-%% simulation
+%% DYNAMICS SIMULATION
 function hist = Dyn_simulation(param, hist, k)
-%DYN_SIMULATION     Propagate target and chaser spacecraft states and features
+% Propagate target and chaser spacecraft states and features
 %
 % This function calculates the states at the next time step (k+1) for both
 % target and chaser spacecraft, including relative LVLH states, feature points,
@@ -132,9 +132,9 @@ function hist = Dyn_simulation(param, hist, k)
     hist.dE(:,k+1) = dk - param.mud;    % estimation error
 end
 
-%% ------------------------------------------------------------------------
+%% ODERK4 INTEGRATOR
 function [t, X] = odeRK4(odefun, tspan, x0, dt)
-% odeRK4  Fixed-step 4th-order Runge-Kutta integrator
+% Fixed-step 4th-order Runge-Kutta integrator
 %
 % Usage:
 %   [t, X] = odeRK4(@(t,x) f(t,x), tspan, x0, dt)

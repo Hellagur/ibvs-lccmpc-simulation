@@ -1,22 +1,33 @@
+%% PLOT LAGUERRE PARAMETER EPS PIXEL ERROR
 function Plot_laguerre_parameter_eps_pixel_error2(file_path, file_name, nl_eps, steps)
-    % Assume nl_eps is [nl eps] 171 x 2 matrix, sorted by nl (if not, sortrows(nl_eps,1))
-    unique_nl = unique(nl_eps(:,1)); % Extract unique nl values [2 3 ... 10]
+% Plot pixel error vs time for different Laguerre parameters
+%
+% This function creates a tiled subplot showing pixel error trajectories
+% for different combinations of Laguerre basis functions (Nl) and 
+% time scaling parameters (epsilon).
+%
+% Inputs:
+%   file_path  - directory path to simulation files
+%   file_name  - function for generating filename
+%   nl_eps     - matrix of [Nl, epsilon] pairs
+%   steps      - number of time steps to plot
+
+    unique_nl = unique(nl_eps(:,1));
     tspan = 0:0.5:(steps-1)*0.5;
-    figure('Units','inches', 'Position', [1 1 12 10]); % Enlarge canvas
-    tiledlayout(3,3, 'TileSpacing','compact'); % 3 x 3 subplots, grouped by nl
+    figure('Units','inches', 'Position', [1 1 12 10]);
+    tiledlayout(3,3, 'TileSpacing','compact');
     
-    % Initialize global min/max for y-axis
     global_min = Inf;
     global_max = -Inf;
     
-    ax_handles = gobjects(length(unique_nl), 1); % Store axes handles for each subplot
+    ax_handles = gobjects(length(unique_nl), 1);
     
     for k = 1:length(unique_nl)
         nl_val = unique_nl(k);
-        idx_nl = nl_eps(:,1) == nl_val; % Select all eps for current nl
-        nl_subset = nl_eps(idx_nl,:); % Subset [fixed nl, varying eps]
-        colors = parula(size(nl_subset,1)); % Gradient colors for eps in each subplot
-        ax = nexttile; % New subplot
+        idx_nl = nl_eps(:,1) == nl_val;
+        nl_subset = nl_eps(idx_nl,:);
+        colors = parula(size(nl_subset,1));
+        ax = nexttile;
         ax_handles(k) = ax;
         hold on;
         
@@ -72,12 +83,8 @@ function Plot_laguerre_parameter_eps_pixel_error2(file_path, file_name, nl_eps, 
              'FontSize',10, 'FontWeight','bold');
     end
     
-    % Set same y-axis range for all subplots (log axis, avoid 0, use small value like 1e-6 if global_min==0)
     if global_min <= 0
-        global_min = 1e-6; % Adjust min for log axis
+        global_min = 1e-6;
     end
     set(ax_handles, 'YLim', [global_min, global_max]);
-    
-    % Add inset logic similar to original code, but can copy to each subplot or omit to simplify
-    % ... (If needed, copy original inset to each subplot, but it may be crowded; suggest moving to separate function)
 end

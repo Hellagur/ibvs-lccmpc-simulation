@@ -1,3 +1,6 @@
 *.asv
 *.fis
+*.mat
+*.sln
 Data/
+.minimax/

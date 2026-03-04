@@ -1,16 +1,35 @@
+%% BUILD QP CONSTRAINTS
 function [Aqp, bqp] = Build_qp_constraints( ...
         method, en_ccons, param, xk, M, H, S, D)
+% Construct constraint matrices for quadratic programming problem
+%
+% This function builds the inequality constraints for the QP problem in
+% model predictive control. It handles input constraints, state constraints,
+% and applies chance constraint tightening for robustness against disturbances.
+%
+% Inputs:
+%   method   - constraint formulation method: 'eta' (default), 'du', or 'u'
+%   en_ccons - enable chance constraints flag (boolean)
+%   param    - structure containing control parameters and constraints
+%   xk       - current state vector
+%   M, H, S  - system matrices for prediction
+%   D        - disturbance matrix
+%
+% Outputs:
+%   Aqp - combined constraint matrix
+%   bqp - combined constraint bounds
 
-    % dimensions
+    % Dimensions
     nu = param.n_controls;
     Np = param.Np;
     Nc = param.Nc;
 
-    % ---------- input constraint ----------
+
+    % ---------- Input constraint ----------
     if isempty(method) || strcmp(method, 'eta')
         C    = kron(tril(ones(Nc)), eye(nu));
         Up   = repmat(param.up, Nc, 1);
-        Au_u = param.Au_ * C * param.T;   % maps η to input constraint
+        Au_u = param.Au_ * C * param.T;   % Maps η to input constraint
         bu_u = param.bu_ - param.Au_ * Up;
     elseif strcmp(method, 'du')
         C    = kron(tril(ones(Nc)), eye(nu));
@@ -22,10 +41,12 @@ function [Aqp, bqp] = Build_qp_constraints( ...
         bu_u = param.bu_;
     end
 
-    % ---------- disturbance sequence ----------
+
+    % ---------- Disturbance sequence ----------
     ds = kron(ones(Np,1), param.mud);
 
-    % ---------- chance constraint tightening ----------
+
+    % ---------- Chance constraint tightening ----------
     Ac = param.Ax_;
     bc = param.bx_;
     up = param.up;
@@ -35,6 +56,7 @@ function [Aqp, bqp] = Build_qp_constraints( ...
     else
         bd = zeros(size(bc));
     end
+
 
     if isempty(method) || strcmp(method, 'eta')
         Aineq = Ac * S * param.T;
@@ -47,7 +69,8 @@ function [Aqp, bqp] = Build_qp_constraints( ...
         bineq = bc - Ac * (M * xk + D * ds) + bd;
     end
 
-    % ---------- final QP constraints ----------
+
+    % ---------- Final QP constraints ----------
     Aqp = [Au_u;
            Aineq];
 

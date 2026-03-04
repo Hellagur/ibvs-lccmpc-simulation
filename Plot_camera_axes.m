@@ -1,39 +1,35 @@
+%% PLOT CAMERA AXES
 function Plot_camera_axes(origin, R, scale, color, alpha)
-%PLOT_CAMERA_AXES   Visualize a 3D camera frustum aligned with the local z-axis.
+% Visualize 3D camera frustum in world coordinates
 %
 % This function draws a simplified 3D camera model represented by a 
 % viewing frustum and image plane, given the camera's position, orientation, 
-% and scaling factor. It is useful for visualizing camera poses and 
-% fields of view in spacecraft visual servoing or 3D reconstruction simulations.
+% and scaling factor.
 %
 % Inputs:
-%   origin — 3×1 vector, camera center position in world coordinates.
-%   R      — 3×3 rotation matrix, transformation from camera frame to world frame.
-%   scale  — scalar, scaling factor defining focal length and image plane size.
-%   color  — 1×3 RGB vector specifying frustum color, e.g., [0, 0, 1].
-%   alpha  — scalar in [0,1], transparency of the image plane (default: 0.5).
+%   origin - 3×1 camera center position in world coordinates
+%   R      - 3×3 rotation matrix (camera frame to world frame)
+%   scale  - scaling factor defining focal length and image plane size
+%   color  - 1×3 RGB vector specifying frustum color
+%   alpha  - scalar in [0,1], transparency of image plane
 %
-% Example:
-%   R = eye(3); 
-%   origin = [0;0;0];
-%   Plot_camera_axes(origin, R, 1.0, [0,0.7,1], 0.4);
-
+% Outputs:
+%   None (displays in current axes)
 
     if nargin < 5, alpha = 0.5; end
 
-    %% ===== Camera intrinsic geometry =====
-    % Define a virtual image plane located at distance f along +z axis
-    f = scale;               % focal length (depth of image plane)
-    w = 0.640 * scale;       % image width
-    h = 0.512 * scale;       % image height
+    % Camera intrinsic geometry
+    f = scale;
+    w = 0.640 * scale;
+    h = 0.512 * scale;
 
-    % Image plane corners in camera coordinates (assuming optical axis = z)
-    p1 = [ w/2  h/2  f]';    % top-right corner
-    p2 = [-w/2  h/2  f]';    % top-left corner
-    p3 = [-w/2 -h/2  f]';    % bottom-left corner
-    p4 = [ w/2 -h/2  f]';    % bottom-right corner
+    % Image plane corners in camera coordinates
+    p1 = [ w/2  h/2  f]';
+    p2 = [-w/2  h/2  f]';
+    p3 = [-w/2 -h/2  f]';
+    p4 = [ w/2 -h/2  f]';
 
-    % Transform image plane corners to world coordinates
+    % Transform to world coordinates
     z_len = 0.3;
     pos_rel = R * [0; 0; z_len];
     origin = origin + pos_rel;
@@ -42,22 +38,20 @@ function Plot_camera_axes(origin, R, scale, color, alpha)
     p3 = origin + R * p3;
     p4 = origin + R * p4;
 
-    %% ===== Draw the image plane =====
+    % Draw image plane
     patch('XData', [p1(1), p2(1), p3(1), p4(1)], ...
           'YData', [p1(2), p2(2), p3(2), p4(2)], ...
           'ZData', [p1(3), p2(3), p3(3), p4(3)], ...
           'FaceColor', color, 'FaceAlpha', alpha, ...
-          'EdgeColor', 'k');  % black edge for better visibility
+          'EdgeColor', 'k');
 
-    %% ===== Draw frustum lines =====
-    % Connect camera center with image plane corners
+    % Draw frustum lines
     line([origin(1) p1(1)], [origin(2) p1(2)], [origin(3) p1(3)], 'Color', color);
     line([origin(1) p2(1)], [origin(2) p2(2)], [origin(3) p2(3)], 'Color', color);
     line([origin(1) p3(1)], [origin(2) p3(2)], [origin(3) p3(3)], 'Color', color);
     line([origin(1) p4(1)], [origin(2) p4(2)], [origin(3) p4(3)], 'Color', color);
 
-    %% ===== Draw camera center =====
-    % Represent the camera optical center as a small black sphere
+    % Draw camera center
     plot3(origin(1), origin(2), origin(3), 'ko', ...
           'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'k', 'MarkerSize', 2);
 end

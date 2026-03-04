@@ -1,4 +1,21 @@
-function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)    
+%% GENERATE INITIAL POSE
+function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)
+% Generate initial poses for Monte Carlo simulation
+%
+% This function generates random initial relative poses between target and
+% chaser spacecraft for Monte Carlo analysis of spacecraft rendezvous operations.
+% It performs guided sampling to ensure valid initial conditions satisfy
+% image plane constraints.
+%
+% Inputs:
+%   N - number of samples to generate
+%
+% Outputs:
+%   s_ct0_all   - MRP orientation of chaser relative to target (3×N)
+%   r_tc0_all   - position of chaser in target frame (3×N)
+%   w_ti0_all   - angular velocity of target (3×N)
+%   image_all   - initial feature points in image plane (8×N)
+
     rng('shuffle');
     radius = -20; % radius in T-body frame
     w_max = 1.5; % maximum of angular velocity component
@@ -9,11 +26,13 @@ function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)
     % adjust based on acceptance rate (e.g., pi/6 ~30 deg)
     cos_theta_min = cos(theta_max);
     
+    
     % Pre-allocate arrays
     s_ct0_all = zeros(3, N);
     r_tc0_all = zeros(3, N);
     w_ti0_all = zeros(3, N);
     image_all = zeros(8, N);
+    
     
     parfor i = 1:N
         % Uniform sampling on the spherical cap
@@ -25,6 +44,7 @@ function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)
         r_tc0 = [radius * sin(alpha) * cos(beta);
                  radius * sin(alpha) * sin(beta);
                  radius * cos(alpha)];
+
 
         % Target's angular velocity in T-body frame
         w_ti0 = deg2rad(2 * w_max * rand(3, 1) - w_max);
@@ -47,7 +67,7 @@ function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)
             R_nom = roll_rot * align_R;
             
             % Random tilt: uniform on spherical cap
-            u_tilt = cos_theta_min + (1 - cos_theta_min) * rand();
+            u_tilt = cos_theta_min + (1 - cos_theta_min) * rand(); 
             theta = acos(u_tilt);
             psi = 2 * pi * rand();
             axis_tilt = [cos(psi); sin(psi); 0];
@@ -89,14 +109,35 @@ function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)
     end
 end
 
+%% SKEW SYMMETRIC MATRIX
 % Helper function: skew symmetric matrix
+%
+% Constructs the skew-symmetric matrix from a 3D vector for cross product
+% representation: S(v) * w = v × w
+%
+% Inputs:
+%   v - 3D vector
+%
+% Outputs:
+%   S - 3×3 skew-symmetric matrix
 function S = skew(v)
     S = [0, -v(3), v(2);
          v(3), 0, -v(1);
          -v(2), v(1), 0];
 end
 
+%% AXIS-ANGLE TO DCM
 % Helper function: rotation matrix from axis-angle
+%
+% Converts axis-angle representation to direction cosine matrix (DCM)
+% using Rodrigues' rotation formula
+%
+% Inputs:
+%   axis  - rotation axis (3D vector, will be normalized)
+%   angle - rotation angle in radians
+%
+% Outputs:
+%   R - 3×3 direction cosine matrix
 function R = angleaxis2dcm(axis, angle)
     if norm(axis) == 0
         R = eye(3);
@@ -107,7 +148,18 @@ function R = angleaxis2dcm(axis, angle)
     R = eye(3) + sin(angle) * K + (1 - cos(angle)) * K * K;
 end
 
+%% VECTOR TO DCM
 % Helper function: DCM that maps vec1 to vec2 (minimal rotation)
+%
+% Constructs a direction cosine matrix that rotates vec1 to align with vec2
+% using the shortest rotation path (minimum angle)
+%
+% Inputs:
+%   vec1 - source vector
+%   vec2 - target vector
+%
+% Outputs:
+%   R - 3×3 direction cosine matrix
 function R = vec2dcm(vec1, vec2)
     v1 = vec1 / norm(vec1);
     v2 = vec2 / norm(vec2);
@@ -130,7 +182,17 @@ function R = vec2dcm(vec1, vec2)
     R = eye(3) + s * K + (1 - c) * K * K;
 end
 
+%% DCM TO MRP
 % Helper function: convert DCM to MRP
+%
+% Converts a direction cosine matrix to Modified Rodrigues Parameters (MRP)
+% representation of attitude
+%
+% Inputs:
+%   R - 3×3 direction cosine matrix
+%
+% Outputs:
+%   s - 3×1 MRP vector
 function s = dcm2mrp(R)
     trace = R(1,1) + R(2,2) + R(3,3);
     theta = acos((trace - 1)/2);

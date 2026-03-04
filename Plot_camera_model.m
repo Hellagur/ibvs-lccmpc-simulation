@@ -1,32 +1,21 @@
+%% PLOT CAMERA MODEL
 function Plot_camera_model(origin, R, scale, bodyColor, lensColor)
-%PLOT_CAMERA_MODEL  Draw a 3D camera model (body + lens) at a specified pose.
+% Draw 3D camera model at specified pose
 %
 % This function visualizes a 3D camera body composed of a rectangular 
 % cube (main body) and a short cylinder (lens). The model is oriented 
-% along the camera’s local +z axis and transformed to world coordinates 
-% according to the given rotation matrix and position vector.
+% along the camera's local +z axis.
 %
 % Inputs:
-%   origin     — 3×1 vector, camera center position in world coordinates.
-%   R          — 3×3 rotation matrix, camera-to-world transformation.
-%   scale      — scalar, scaling factor controlling overall model size (default: 1.0).
-%   bodyColor  — 1×3 RGB vector specifying camera body color (default: [0.8 0.8 0.8]).
-%   lensColor  — 1×3 RGB vector specifying lens color (default: [0.5 0.5 0.5]).
+%   origin     - 3×1 camera center position in world coordinates
+%   R          - 3×3 rotation matrix (camera-to-world transformation)
+%   scale      - scaling factor controlling overall model size
+%   bodyColor  - 1×3 RGB vector for camera body color
+%   lensColor  - 1×3 RGB vector for lens color
 %
-% Example:
-%   origin = [0;0;0];
-%   R = eye(3);
-%   Plot_camera_model(origin, R, 1.0, [0.7 0.7 0.7], [0.2 0.2 0.8]);
-%
-% Description:
-%   - The main body is represented by a rectangular cube centered at
-%     (0, 0, -0.025) in the camera frame.
-%   - The lens is modeled as a short cylinder aligned with the +z axis.
-%   - The combined model provides an intuitive visualization of 
-%     camera pose and orientation in 3D scenes, e.g., in spacecraft
-%     visual servoing or SLAM simulation.
+% Outputs:
+%   None (displays in current axes)
 
-    %% ===== Default Parameters =====
     if nargin < 5
         lensColor = [0.5 0.5 0.5];
     end
@@ -37,7 +26,7 @@ function Plot_camera_model(origin, R, scale, bodyColor, lensColor)
         scale = 1.0;
     end
 
-    %% ===== Create Camera Body (Cube) =====
+    % Create camera body (cube)
     % Cube centered around (0,0,-0.025) in the camera frame
     z_len = 0.02;
     [Xb, Yb, Zb] = meshgrid([-0.025 0.025], [-0.025 0.025], [-z_len, z_len]);
@@ -63,9 +52,9 @@ function Plot_camera_model(origin, R, scale, bodyColor, lensColor)
     patch('Vertices', verts', 'Faces', faces, ...
           'FaceColor', bodyColor, 'EdgeColor', 'k', 'FaceAlpha', 0.6);
 
-    %% ===== Create Camera Lens (Cylinder) =====
-    [Xc, Yc, Zc] = cylinder(0.02 * scale, 20);  % radius = 0.02
-    Zc = Zc * 0.03 * scale;                     % lens depth
+    % Create camera lens (cylinder)
+    [Xc, Yc, Zc] = cylinder(0.02 * scale, 20);
+    Zc = Zc * 0.03 * scale;
     lensPoints = [Xc(:)'; Yc(:)'; Zc(:)'];
 
     % Rotate and translate lens
@@ -79,8 +68,7 @@ function Plot_camera_model(origin, R, scale, bodyColor, lensColor)
     surf(Xc_new, Yc_new, Zc_new, ...
          'FaceColor', lensColor, 'EdgeColor', 'none', 'FaceAlpha', 0.6);
 
-    %% ===== Draw Front Cap Outline =====
-    % Outline circle at the lens front (Z = maximum plane)
+    % Draw front cap outline
     theta = linspace(0, 2*pi, 100);
     r = 0.02 * scale;
     xc = r * cos(theta);

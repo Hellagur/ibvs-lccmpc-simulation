@@ -1,4 +1,17 @@
+%% PLOT MONTE CARLO TERMINAL POSE ERROR BOXPLOT
 function Plot_monte_carlo_terminal_pose_error_boxplot(path, total_numbers)
+% Plot boxplot of terminal relative pose errors
+%
+% This function visualizes the distribution of terminal position and attitude
+% errors from Monte Carlo simulations using boxplots.
+%
+% Inputs:
+%   path          - directory path to simulation files
+%   total_numbers - number of simulation files
+%
+% Outputs:
+%   None (displays figure)
+
     errors = zeros(6, total_numbers);
     for i = 1:total_numbers
         fname = fullfile(path, [num2str(i), '.mat']);
@@ -13,15 +26,14 @@ function Plot_monte_carlo_terminal_pose_error_boxplot(path, total_numbers)
         errors(:,i) = [r_ct_t - [0;0;-5]; s_ct];
     end
     
-    % === 绘图部分 ===
-    fig = figure('Units','inches','Position',[1 1 8 6]);
+    figure('Units','inches','Position',[1 1 8 6]);
     tiledlayout(2,1, 'TileSpacing', 'compact');
     
-    % 子图1: 位置误差 (x_T, y_T, z_T)
+    % Position errors
     nexttile;
     hold on;
-    pos_errors = errors(1:3, :)';  % 转置为箱线图输入
-    h_pos = boxplot(pos_errors, ...
+    pos_errors = errors(1:3, :)';
+    boxplot(pos_errors, ...
         'Labels', {'$$x$$', '$$y$$', '$$z$$'}, ...
         'Whisker', 1.5, 'Widths', 0.6);
     cmap_pos = [0.3 0.7 1.0; 0.3 0.7 1.0; 0.3 0.7 1.0];
@@ -37,21 +49,17 @@ function Plot_monte_carlo_terminal_pose_error_boxplot(path, total_numbers)
     ylabel('$||\boldmath{\rho}_{CT}(t_f)-\boldmath{\rho}_{CT}^*||_2$ (m)', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter','latex');
     set(gca, 'TickLabelInterpreter', 'latex', 'FontSize', 12, 'FontName', 'Times New Roman');
     grid on; box off;
-    % title('Relative Position Error', 'Interpreter', 'latex', 'FontSize', 14);
     ylim([-0.0155, 0.0155]);
     ax = gca;
-    % 设置 y 轴指数为 -3（即 ×10^{-3}），并显示在轴顶部
     ax.YAxis.Exponent = -2;
-    
-    % 设置 y 轴刻度标签格式为整数（%.0f 表示无小数位）
     ax.YAxis.TickLabelFormat = '%.0f';
     
-    % 子图2: 姿态误差 (σ_CL,1, σ_CL,2, σ_CL,3)
+    % Attitude errors
     nexttile;
     hold on; box off;
     ylim([-1e-4, 1e-4]);
-    att_errors = errors(4:6, :)';  % 转置为箱线图输入
-    h_att = boxplot(att_errors, ...
+    att_errors = errors(4:6, :)';
+    boxplot(att_errors, ...
         'Labels', {'$$\sigma_{CL,1}$$', '$$\sigma_{CL,2}$$', '$$\sigma_{CL,3}$$'}, ...
         'Whisker', 1.5, 'Widths', 0.6);
     cmap_att = [0.4 0.8 0.8; 0.4 0.8 0.8; 0.4 0.8 0.8];
@@ -67,9 +75,8 @@ function Plot_monte_carlo_terminal_pose_error_boxplot(path, total_numbers)
     ylabel('$||\boldmath{\sigma}_{CL}(t_f)||_2$ (MRPs)', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
     set(gca, 'TickLabelInterpreter', 'latex', 'FontSize', 12, 'FontName', 'Times New Roman');
     grid on;
-    % title('Relative Attitude Error (MRPs)', 'Interpreter', 'latex', 'FontSize', 14);
 
-    % 共享图例（放置在figure外部或一个子图中）
+    % Legend
     h1 = plot(NaN,NaN,'s','Color',[0.3 0.7 1.0],'MarkerFaceColor',[0.3 0.7 1.0],...
         'MarkerSize',10,'DisplayName','Q1–Q3 (Box)');
     h2 = plot(NaN,NaN,'-r','LineWidth',1.5,'DisplayName','Median (Q2)');
@@ -77,8 +84,8 @@ function Plot_monte_carlo_terminal_pose_error_boxplot(path, total_numbers)
     h4 = plot(NaN,NaN,'xr','MarkerSize',8,'DisplayName','Outliers','LineWidth',1.0);
     legend([h1,h2,h3,h4], 'Location','northeastoutside', ...
         'Orientation','vertical','FontSize',10,'Box','on');
-    
-    % 输出均值和中位数到命令行（分开位置和姿态）
+
+    % Print error report
     fprintf('Terminal Position Errors:\n');
     pos_mean = mean(errors(1:3,:), 2);
     pos_median = median(errors(1:3,:), 2);

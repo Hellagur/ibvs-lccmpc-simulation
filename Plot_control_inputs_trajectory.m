@@ -1,26 +1,24 @@
+%% PLOT CONTROL INPUTS TRAJECTORY
 function fig = Plot_control_inputs_trajectory(param, hist, k, saveFig)
-%PLOT_CONTROL_INPUTS_TRAJECTORY     Plot the spacecraft control inputs over time.
+% Plot spacecraft control inputs over time
 %
-% This function visualizes both the thrust forces and control moments
-% applied in the spacecraft body frame over the simulation duration.
-% Thrust forces are scaled by the mass for plotting convenience.
+% This function visualizes both thrust forces and control moments applied
+% in the spacecraft body frame over the simulation duration.
 %
 % Inputs:
-%   param    — Struct containing system parameters, e.g., param.ts (sampling time), param.mc (mass)
-%   hist     — Struct containing history of states and control inputs:
-%              hist.u (6×k) stores control inputs: 
-%                [fx; fy; fz; tau_x; tau_y; tau_z]
-%   k        — Scalar, current time step index
-%   saveFig  — Logical, true to save figure as PDF in ./figs folder
+%   param   - structure containing system parameters (ts, ms, fm, tm)
+%   hist    - structure containing control history (u, uT)
+%   k       - current time step index
+%   saveFig - boolean, whether to save figure as PDF
 %
-% Example:
-%   Plot_control_inputs_trajectory(param, hist, 100, true);
+% Outputs:
+%   fig - figure handle
 
-    %% ===== Prepare Figure =====
+    %% Prepare Figure
     fig = figure('Units','inches','Position',[1 1 8 6]);
     tspan = (0:1:k-1) * param.ts;  % time vector
 
-    %% ===== Subplot 1: Thrust Forces =====
+    %% Subplot 1: Thrust Forces
     subplot(211)
     ms = param.ms;
     fm = param.fm*ms;
@@ -38,7 +36,7 @@ function fig = Plot_control_inputs_trajectory(param, hist, k, saveFig)
            'FontSize', 12, 'FontName', 'Times New Roman', ...
            'Interpreter', 'latex', 'Location', 'northeast');
 
-    %% ===== Subplot 2: Control Moments =====
+    %% Subplot 2: Control Moments
     subplot(212)
     view(2); hold on; box off;
     stairs(tspan, hist.uT(4,1:k),'r-','LineWidth',1.5);  % tau_x
@@ -55,7 +53,7 @@ function fig = Plot_control_inputs_trajectory(param, hist, k, saveFig)
            'FontSize', 12, 'FontName', 'Times New Roman', ...
            'Interpreter', 'latex', 'Location', 'northeast');
 
-    %% ===== Save Figure if Requested =====
+    %% Save Figure if Requested
     if saveFig
         set(gcf, 'PaperPositionMode', 'auto');      % automatic paper size
         set(gcf, 'Renderer', 'painters');           % vector graphics

@@ -1,3 +1,24 @@
+%% MAIN SIMULATION SCRIPT FOR CHANCE-CONSTRAINED IBVS-MPC
+%
+% This script performs a simulation of an image-based spacecraft rendezvous
+% control scenario using a chance-constrained Model Predictive Control (CC-MPC)
+% framework. It initializes system parameters, performs disturbance estimation,
+% solves the MPC optimization problem iteratively, and visualizes results
+% through multiple trajectory plots.
+%
+% The simulation supports various configurations:
+%   - Control variable methods: 'eta', 'du', 'u'
+%   - Cost parameter methods: 'adaptive', 'zero', 'one'
+%   - Monte Carlo analysis with varying initial conditions
+%   - Laguerre parameter studies
+%
+% Steps:
+%   1. Generate initial pose (or load from file)
+%   2. Generate fuzzy inference system for gamma adjustment
+%   3. Initialize system, model, and MPC parameters
+%   4. Run iterative MPC simulation loop
+%   5. Plot results (if enabled)
+
 clc; clear;
 
 %% ============================================================
@@ -25,7 +46,7 @@ run('Gen_fuzzy_file.m');
 Info.Cv_method      = 'eta';            % three control-variable methods: 'eta', 'du', 'u'
 Info.Cp_method      = 'adaptive';       % three cost-parameter methods: 'adaptive', 'zero', 'one'
 Info.En_chanceCons  = true;             % enable to use chance constraints?
-Info.En_default     = true;             % enable to use default initial values (s_ct0,r_tc0,w_ti0)?
+Info.En_default     = false;             % enable to use default initial values (s_ct0,r_tc0,w_ti0)?
 Info.En_varNeps     = false;            % enable to vary parameters (N,epsilon)?
 Info.En_rndShuffle  = false;            % enable rng('shuffle')?
 Info.En_RT_figure   = true;             % enable to plot real-time figure?
@@ -36,11 +57,13 @@ Info.fileTotalNum   = 500;
 Info.filePath       = fullfile('Data', 'Control_Variables_Compare', Info.Cv_method);
 Info.fileName       = @(i) [num2str(i), '.mat'];
 
+
 if Info.En_rndShuffle                   % Enable rng("shuffle")?
     rng("shuffle");
 else
     rng(42, "twister");
 end
+
 
 if Info.En_varNeps                      % Enable to vary (N,epsilon)?
     nl_list     = 2:1:10;
@@ -52,6 +75,7 @@ if Info.En_varNeps                      % Enable to vary (N,epsilon)?
     Info.fileName       = @(N,eps) ['N=',num2str(N),'_','eps=',num2str(eps),'.mat'];
     Info.fileTotalNum   = size(nl_eps, 1);
 end
+
 
 if Info.En_default                      % Enable default parameters?
     Info.filePath       = fullfile('Data', 'Cost_Parameters_Compare');
@@ -187,6 +211,7 @@ for i = 1:Info.fileTotalNum
         save(fileName, "param", "hist");
         disp(['counter = ', num2str(i)]);
     end
+
 
 end
 

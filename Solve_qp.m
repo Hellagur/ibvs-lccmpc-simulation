@@ -1,15 +1,30 @@
+%% SOLVE QUADRATIC PROGRAMMING
 function [uopt, info, solver] = Solve_qp(solver)
-    if isfield(solver,'xx') && ~isempty(solver.xx)  % 只在有有效xx时warm-start
-        solver.prob.xx = solver.xx;  % 用itr或intpnt取决于MOSEK版本，试itr
+% Solve quadratic programming problem using MOSEK optimizer
+%
+% This function invokes the MOSEK solver to compute the optimal control
+% inputs for the MPC optimization problem. It supports warm-starting
+% using previously computed solutions for improved computational efficiency.
+%
+% Inputs:
+%   solver - structure containing MOSEK problem and parameter settings
+%
+% Outputs:
+%   uopt   - optimal control inputs
+%   info   - solver status ('OPTIMAL', 'ERROR', or 'PRIMAL_AND_DUAL_FEASIBLE')
+%   solver - updated solver structure with solution for warm-start
+
+    if isfield(solver,'xx') && ~isempty(solver.xx)  % Warm-start only with valid xx
+        solver.prob.xx = solver.xx;  % Use itr or intpnt depending on MOSEK version
     end
     [rcode, res] = mosekopt('minimize', solver.prob, solver.param);
     if rcode == 0 && isfield(res,'sol') && isfield(res.sol,'itr')
-        info = res.sol.itr.prosta;  % 用itr for QP
+        info = res.sol.itr.prosta;  % Use itr for QP
         uopt = res.sol.itr.xx;
-        solver.xx = uopt;  % 保存用于下次
+        solver.xx = uopt;  % Save for next iteration
     else
-        info = 'ERROR';  % 或 res.info if available
-        uopt = [];  % 失败返回空
+        info = 'ERROR';  % Or res.info if available
+        uopt = [];  % Return empty on failure
         warning('MOSEK solve failed: %s', info);
     end
 end
