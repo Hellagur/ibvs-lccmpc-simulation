@@ -29,10 +29,9 @@ fis = addMF(fis, 'w_err', 'trimf', [0.07 0.095 0.095], 'Name', 'High'  , 'Variab
 
 % Add output variable: gamma
 fis = addOutput(fis, [0 1], 'Name', 'gamma');
-fis = addMF(fis, 'gamma', 'linear', [0 0 0], 'Name', 'VeryLow');  % Example: 0*v + 0*w + 0
-fis = addMF(fis, 'gamma', 'linear', [0.5 0.3 0.1], 'Name', 'Low'); % a=0.5 (v strong), b=0.3 (w medium), c=0.1
-fis = addMF(fis, 'gamma', 'linear', [1.0 0.5 0.5], 'Name', 'Medium');
-fis = addMF(fis, 'gamma', 'linear', [1.5 1.0 0.75], 'Name', 'High'); % Adjust coefficients to match logic, high偏向1
+fis = addMF(fis, 'gamma', 'linear', [0 0 0], 'Name', 'Low');  % Example: 0*v + 0*w + 0
+fis = addMF(fis, 'gamma', 'linear', [0.5 0.3 0.1], 'Name', 'Medium'); % a=0.5 (v strong), b=0.3 (w medium), c=0.1
+fis = addMF(fis, 'gamma', 'linear', [1.0 0.5 0.5], 'Name', 'High');
 
 % Add rules: [input1 input2 output weight operator], operator=1 is AND
 rules = [
