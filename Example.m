@@ -33,8 +33,8 @@ clc; clear;
 % ============================================================
 
 %% === Step 1: Generate initial pose (Optional) ===
-N = 500;
-[S_ct0, R_tc0, W_ti0, S0] = Gen_init_pose(N);
+% N = 500;
+% [S_ct0, R_tc0, W_ti0, S0] = Gen_init_pose(N);
 
 %% or load initial pose from .mat file (Optional)
 load('Data/Monte_Carlo_Initial_Values/initial_values.mat');
@@ -273,10 +273,16 @@ if Info.En_showPlot && ~Info.En_default && ~Info.En_varNeps
     file3 = [filePath, 'gamma=1.mat'];
     Plot_accumulated_energy_compare(file1, file2, file3);
 
-    %% feature trajectories ✅
+    %% feature trajectories ❌ using *_zoom.m
     filePath = 'Data/Chance_Constraints_Compare/';
     Plot_monte_carlo_feature_trajectories3([filePath, 'chance'], Info.fileTotalNum);
     Plot_monte_carlo_feature_trajectories3([filePath, 'no_chance'], Info.fileTotalNum);
+
+    %% feature trajectories ✅
+    filePath = 'Data/Chance_Constraints_Compare/';
+    Plot_monte_carlo_feature_trajectories_zoom([filePath, 'chance'], Info.fileTotalNum);
+    Plot_monte_carlo_feature_trajectories_zoom([filePath, 'no_chance'], Info.fileTotalNum);
+
 end
 
 %% Laguerre function with different nl-eps

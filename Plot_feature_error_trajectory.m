@@ -43,7 +43,7 @@ function fig = Plot_feature_error_trajectory(param, hist, k)
     plot(ax_main, tspan, 1.5*ones(length(tspan)), '--', 'Color', '#666666', 'LineWidth', 1.0);
     grid on; box on;
     set(gca, 'YScale', 'log', 'FontSize', 11, 'FontName', 'Times New Roman');
-    xlabel('Time (s)'); ylabel('$||\boldmat{s}_i - \boldmat{s}_{d,i}||_2$', 'Interpreter','latex');
+    xlabel('Time (s)'); ylabel('$||\boldmath{s}_i - \boldmath{s}_{d,i}||_2$', 'Interpreter','latex');
 
     h1 = scatter(NaN, NaN, markerSize, base_colors(1,:), 'filled', 'MarkerFaceAlpha', 0.6);
     h2 = scatter(NaN, NaN, markerSize, base_colors(2,:), 'filled', 'MarkerFaceAlpha', 0.6);

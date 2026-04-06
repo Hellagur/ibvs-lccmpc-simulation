@@ -3,7 +3,7 @@ function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)
 % Generate initial poses for Monte Carlo simulation
 %
 % This function generates random initial relative poses between target and
-% chaser spacecraft for Monte Carlo analysis of spacecraft rendezvous operations.
+% servicer spacecraft for Monte Carlo analysis of spacecraft rendezvous operations.
 % It performs guided sampling to ensure valid initial conditions satisfy
 % image plane constraints.
 %
@@ -11,8 +11,8 @@ function [s_ct0_all, r_tc0_all, w_ti0_all, image_all] = Gen_init_pose(N)
 %   N - number of samples to generate
 %
 % Outputs:
-%   s_ct0_all   - MRP orientation of chaser relative to target (3×N)
-%   r_tc0_all   - position of chaser in target frame (3×N)
+%   s_ct0_all   - MRP orientation of camera relative to target (3×N)
+%   r_tc0_all   - position of camera in target frame (3×N)
 %   w_ti0_all   - angular velocity of target (3×N)
 %   image_all   - initial feature points in image plane (8×N)
 

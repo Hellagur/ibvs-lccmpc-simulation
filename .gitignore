@@ -4,3 +4,4 @@
 *.sln
 Data/
 .minimax/
+.claude/
