@@ -2,6 +2,11 @@
 *.fis
 *.mat
 *.sln
-Data/
 .minimax/
 .claude/
+Data/Chance_Constraints_Compare/
+Data/Control_Variables_Compare/
+Data/Cost_Parameters_Compare/
+Data/Deterministic_Case/
+Data/Laguerre_Parameters_Compare/
+!Data/Monte_Carlo_Initial_Values/initial_values.mat
