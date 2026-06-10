@@ -297,8 +297,8 @@ if Info.En_showPlot && Info.En_varNeps
     Plot_laguerre_parameter_eps_control_energy2(filePath, fileName, nl_eps, 600);
     
     %% Pixel error heatmap ✅
-    Plot_laguerre_parameter_heatmap(filePath, fileName, nl_eps, 601, 'error');
+    Plot_laguerre_parameter_heatmap(filePath, fileName, nl_eps, 601, '像素误差');
     
     %% Energy heatmap ✅
-    Plot_laguerre_parameter_heatmap(filePath, fileName, nl_eps, 600, 'energy');
+    Plot_laguerre_parameter_heatmap(filePath, fileName, nl_eps, 600, '累积能量');
 end

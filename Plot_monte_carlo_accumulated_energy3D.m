@@ -14,6 +14,7 @@ function Plot_monte_carlo_accumulated_energy3D(path1, path2, path3, N)
 % Outputs:
 %   None (displays figure)
 
+    style = Plot_style();
     energy1 = zeros(1, N);
     energy2 = zeros(1, N);
     energy3 = zeros(1, N);
@@ -69,13 +70,30 @@ function Plot_monte_carlo_accumulated_energy3D(path1, path2, path3, N)
     figure('Units','inches', ...
            'Position',[1 1 12 6], ...
            'PaperOrientation', 'landscape');
-    bar3(y, z);
-    xlabel('$$\sum || \boldmath{u} ||_2$$', 'FontSize', 12, 'Interpreter','latex');
-    zlabel('$$N$$', 'FontSize', 12, 'Interpreter','latex');
+    bars = bar3(y, z);
+    bar_colors = [style.method.adaptive; style.method.gamma0; style.method.gamma1];
+    for i = 1:numel(bars)
+        zdata = get(bars(i), 'ZData');
+        cdata = zeros([size(zdata), 3]);
+        for method_idx = 1:size(bar_colors,1)
+            row_idx = (method_idx-1)*6 + (1:6);
+            row_idx = row_idx(row_idx <= size(zdata,1));
+            for channel = 1:3
+                cdata(row_idx,:,channel) = bar_colors(method_idx,channel);
+            end
+        end
+        set(bars(i), ...
+            'CData', cdata, ...
+            'FaceColor', 'flat', ...
+            'FaceAlpha', 0.55, ...
+            'EdgeColor', style.neutral.dark);
+    end
+    xlabel('$$\sum || \boldmath{u} ||_2$$', 'FontSize', 14, 'Interpreter','latex');
+    zlabel('$$\mathrm{N}$$', 'FontSize', 14, 'Interpreter','latex');
     yticks(y);
     yticklabels({'$$\boldmath{u}$$', '$$\Delta \boldmath{u}$$', '$$\boldmath{\eta}$$'});
     xticks(1:length(centers));
     xticklabels(arrayfun(@(x) sprintf('%.1f', x), centers, 'UniformOutput', false));
     set(gca, 'TickLabelInterpreter', 'latex', ...
-        'FontName', 'Times New Roman', 'FontSize', 12);
+        'FontName', 'Times New Roman', 'FontSize', 14);
 end

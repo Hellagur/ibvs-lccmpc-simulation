@@ -13,6 +13,7 @@ function Plot_laguerre_parameter_heatmap(file_path, file_name, nl_eps, steps, ty
 %   steps      - number of time steps
 %   type       - 'error' or 'energy'
 
+    style = Plot_style();
     unique_nl = unique(nl_eps(:,1));
     unique_eps = unique(nl_eps(:,2));
     final_vals = nan(length(unique_nl), length(unique_eps));
@@ -44,9 +45,9 @@ function Plot_laguerre_parameter_heatmap(file_path, file_name, nl_eps, steps, ty
             continue;
         end
         
-        if strcmp(type, 'error')
+        if strcmp(type, '像素误差')
             val = error(end);
-        elseif strcmp(type, 'energy')
+        elseif strcmp(type, '累积能量')
             u = hist.uT(:,1:steps);
             val = sum(vecnorm(u));
         end
@@ -68,7 +69,7 @@ function Plot_laguerre_parameter_heatmap(file_path, file_name, nl_eps, steps, ty
     imagesc(unique_eps, unique_nl, final_vals);
     set(gca, 'YDir','normal');
     
-    cmap = jet(256);
+    cmap = style.cmap(256);
     cmap(end+1, :) = [1 1 1];
     colormap(cmap);
     
@@ -76,15 +77,16 @@ function Plot_laguerre_parameter_heatmap(file_path, file_name, nl_eps, steps, ty
     set(gca, 'Color', [1 1 1]);
     
     cb = colorbar;
-    cb.Label.String = ['Final ', type];
-    xlabel('$$\epsilon$$', 'Interpreter','latex', 'FontSize',12);
-    ylabel('$$N_l$$', 'Interpreter','latex', 'FontSize',12);
-    set(gca,'FontName','Times New Roman','FontSize',12);
+    cb.Label.String = ['\fontname{宋体}终端', type];
+    cb.Label.set('Interpreter','tex','FontSize',16);
+    xlabel('$$\epsilon$$', 'Interpreter','latex', 'FontSize',16);
+    ylabel('$$\mathrm{N_l}$$', 'Interpreter','latex', 'FontSize',16);
+    set(gca,'FontName','Times New Roman','FontSize',16);
 
     % Plot selected region
     hold on;
-    plot(linspace(0,0.925,10), 2.5*ones(10,1), 'r', 'LineWidth', 2.5);
-    plot(linspace(0,0.925,10), 3.5*ones(10,1), 'r', 'LineWidth', 2.5);
-    plot(0.875*ones(10,1), linspace(0,3.5,10), 'r', 'LineWidth', 2.5);
-    plot(0.925*ones(10,1), linspace(0,3.5,10), 'r', 'LineWidth', 2.5);
+    plot(linspace(0,0.925,10), 2.5*ones(10,1), 'Color', style.highlight, 'LineWidth', 2.5);
+    plot(linspace(0,0.925,10), 3.5*ones(10,1), 'Color', style.highlight, 'LineWidth', 2.5);
+    plot(0.875*ones(10,1), linspace(0,3.5,10), 'Color', style.highlight, 'LineWidth', 2.5);
+    plot(0.925*ones(10,1), linspace(0,3.5,10), 'Color', style.highlight, 'LineWidth', 2.5);
 end

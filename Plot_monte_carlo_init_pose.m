@@ -13,6 +13,8 @@ function Plot_monte_carlo_init_pose(s_ct0_all, r_tc0_all, N)
 % Outputs:
 %   None (displays figure)
 
+    style = Plot_style();
+
     x = [1;0;0];
     y = [0;1;0];
     z = [0;0;1];
@@ -22,12 +24,12 @@ function Plot_monte_carlo_init_pose(s_ct0_all, r_tc0_all, N)
                  'PaperOrientation', 'landscape');
     view(3); hold on;
 
-    colorX_c = [231 76  60]/255;
-    colorY_c = [46 204 113]/255;
-    colorZ_c = [52 152 219]/255;
-    colorX_t = [255 0 0]/255;
-    colorY_t = [0 255 0]/255;
-    colorZ_t = [0 0 255]/255;
+    colorX_c = style.axis(1,:);
+    colorY_c = style.axis(2,:);
+    colorZ_c = style.axis(3,:);
+    colorX_t = [1 0 0];
+    colorY_t = [0 1 0];
+    colorZ_t = [0 0 1];
 
     plot3(0, 0, 0, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'k', 'MarkerSize', 5);
     
@@ -54,7 +56,7 @@ function Plot_monte_carlo_init_pose(s_ct0_all, r_tc0_all, N)
         Plot_arrow3D(start, start + 3 * z_tc', colorZ_c, 0.5, 0.1, 0.5);
     end
 
-    sphereColor = [199 212 226]/255;
+    sphereColor = style.state.plane(1,:);
     f = @(x,y,z,r) x.^2 + y.^2 + z.^2 - r^2;
     hSphere = fimplicit3(@(x,y,z) f(x,y,z,5), [-5 5 -5 5 -5 5]);
     hSphere.FaceColor = sphereColor;
@@ -76,26 +78,26 @@ function Plot_monte_carlo_init_pose(s_ct0_all, r_tc0_all, N)
     y(~mask) = nan;
     z(~mask) = nan;
     
-    coneColor = [255 204 153]/255;
+    coneColor = style.state.plane(3,:);
     hInitSphere = surf(x, y, z);
     hInitSphere.FaceColor = coneColor;
     hInitSphere.FaceAlpha = 0.15;
     hInitSphere.EdgeColor = 'none';
 
     grid on; axis equal;
-    xlabel('$x_T\ (m)$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    ylabel('$y_T\ (m)$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    zlabel('$z_T\ (m)$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    xlabel('$x_\mathrm{T}\ (\mathrm{m})$', 'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    ylabel('$y_\mathrm{T}\ (\mathrm{m})$', 'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    zlabel('$z_\mathrm{T}\ (\mathrm{m})$', 'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
 
-    hxt = plot3(NaN,NaN,NaN, 'Color', colorX_t, 'LineWidth', 2, 'DisplayName', '$\hat{x}_T$');
-    hyt = plot3(NaN,NaN,NaN, 'Color', colorY_t, 'LineWidth', 2, 'DisplayName', '$\hat{y}_T$');
-    hzt = plot3(NaN,NaN,NaN, 'Color', colorZ_t, 'LineWidth', 2, 'DisplayName', '$\hat{z}_T$');
-    hxc = plot3(NaN,NaN,NaN, 'Color', colorX_c, 'LineWidth', 2, 'DisplayName', '$\hat{x}_C$');
-    hyc = plot3(NaN,NaN,NaN, 'Color', colorY_c, 'LineWidth', 2, 'DisplayName', '$\hat{y}_C$');
-    hzc = plot3(NaN,NaN,NaN, 'Color', colorZ_c, 'LineWidth', 2, 'DisplayName', '$\hat{z}_C$');    
+    hxt = plot3(NaN,NaN,NaN, 'Color', colorX_t, 'LineWidth', 2, 'DisplayName', '$\hat{x}_\mathrm{T}$');
+    hyt = plot3(NaN,NaN,NaN, 'Color', colorY_t, 'LineWidth', 2, 'DisplayName', '$\hat{y}_\mathrm{T}$');
+    hzt = plot3(NaN,NaN,NaN, 'Color', colorZ_t, 'LineWidth', 2, 'DisplayName', '$\hat{z}_\mathrm{T}$');
+    hxc = plot3(NaN,NaN,NaN, 'Color', colorX_c, 'LineWidth', 2, 'DisplayName', '$\hat{x}_\mathrm{C}$');
+    hyc = plot3(NaN,NaN,NaN, 'Color', colorY_c, 'LineWidth', 2, 'DisplayName', '$\hat{y}_\mathrm{C}$');
+    hzc = plot3(NaN,NaN,NaN, 'Color', colorZ_c, 'LineWidth', 2, 'DisplayName', '$\hat{z}_\mathrm{C}$');    
     
     legend([hxt, hyt, hzt, hxc, hyc, hzc], ...
-        'Interpreter', 'latex', 'FontSize', 10, 'Location', 'northeast', 'Box', 'on');
+        'Interpreter', 'latex', 'FontSize', 12, 'Location', 'northeast', 'Box', 'on');
 
-    set(gca, 'FontSize', 12, 'FontName', 'Times New Roman');
+    set(gca, 'FontSize', 14, 'FontName', 'Times New Roman');
 end

@@ -14,6 +14,8 @@ function Plot_relative_motion_trajectory2D(param, hist, k, saveFig)
 % Outputs:
 %   None (displays figure)
 
+    style = Plot_style();
+
     % Define coordinate axes
     x = [1;0;0]; y = [0;1;0]; z = [0;0;1];
 
@@ -45,9 +47,9 @@ function Plot_relative_motion_trajectory2D(param, hist, k, saveFig)
     grid(ax_main, 'on'); axis(ax_main, 'equal');
     xlim([-4.5,5.5]); ylim([-16.5,5.5])
 
-    color_axes  = [1 0 0; 0 1 0; 0 0 1];
-    color_point = [231 76 60; 46 204 113; 52 152 219; 241 196 15]/255;
-    color_patch = [0 0 1; 204/255 255/255 204/255; 1 0 0];
+    color_axes  = style.axis;
+    color_point = style.feature;
+    color_patch = style.state.plane;
     alpha_vals  = linspace(0.3, 0.5, k);
 
     for i = [1, k]
@@ -65,7 +67,7 @@ function Plot_relative_motion_trajectory2D(param, hist, k, saveFig)
         Plot_arrow3D(pos, pos + 1.5 * y_ls(:,i)', color_axes(2,:), alpha_vals(i));
         Plot_arrow3D(pos, pos + 1.5 * z_ls(:,i)', color_axes(3,:), alpha_vals(i));
         Plot_camera_model(pos', hist.R_cl{i}', 15.0);
-        Plot_camera_axes(pos', hist.R_cl{i}', 2.0, [0.2 0.6 1.0], 0.15);
+        Plot_camera_axes(pos', hist.R_cl{i}', 2.0, style.camera.frustum, 0.15);
     end
 
     for i = idx_array
@@ -90,11 +92,11 @@ function Plot_relative_motion_trajectory2D(param, hist, k, saveFig)
         text_pos = r_l(:,i)' + offset_vectors(j,:);
         text(ax_main, text_pos(1), text_pos(2), text_pos(3), ...
             sprintf('t = %ds', t_labels(j)), ...
-            'FontSize', 10, 'FontName', 'Times New Roman', ...
+            'FontSize', 12, 'FontName', 'Times New Roman', ...
             'Interpreter', 'latex', 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle');
     end
 
-    plot3(r_l(1,:), r_l(2,:), r_l(3,:), 'Color', 'k', 'LineWidth', 1.5);
+    plot3(r_l(1,:), r_l(2,:), r_l(3,:), 'Color', style.neutral.dark, 'LineWidth', 1.5);
 
     xi_l = zeros(3,4);
     for i = idx_array
@@ -112,7 +114,7 @@ function Plot_relative_motion_trajectory2D(param, hist, k, saveFig)
 
         patch('Parent', ax_main, 'Vertices', xi_l', 'Faces', [1 2 3 4], ...
               'FaceColor', 'interp', 'FaceVertexCData', repmat(color_patch(idx,:), 4, 1), ...
-              'FaceAlpha', 0.25, 'EdgeColor', 'black');
+              'FaceAlpha', style.state.planeAlpha(idx), 'EdgeColor', style.neutral.dark);
 
         for j = 1:4
             line([r_l(1,i),xi_l(1,j)], [r_l(2,i),xi_l(2,j)], [r_l(3,i),xi_l(3,j)], ...
@@ -120,10 +122,10 @@ function Plot_relative_motion_trajectory2D(param, hist, k, saveFig)
         end
     end
 
-    xlabel('$x_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    ylabel('$y_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    zlabel('$z_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    set(ax_main, 'FontSize', 12, 'FontName', 'Times New Roman');
+    xlabel('$x_\mathrm{L}\ (\rm{m})$', 'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    ylabel('$y_\mathrm{L}\ (\rm{m})$', 'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    zlabel('$z_\mathrm{L}\ (\rm{m})$', 'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    set(ax_main, 'FontSize', 14, 'FontName', 'Times New Roman');
 
     if saveFig == true
         set(gcf, 'PaperPositionMode', 'auto');

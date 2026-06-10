@@ -25,7 +25,8 @@ function fig = Plot_feature_error_trajectory(param, hist, k)
     end
 
 
-    base_colors = [231, 76, 60; 46, 204, 113; 52, 152, 219; 241, 196, 15] / 255;
+    style = Plot_style();
+    base_colors = style.feature;
     markerSize = 30;
 
     % --- Main plot ---
@@ -40,18 +41,19 @@ function fig = Plot_feature_error_trajectory(param, hist, k)
         end
         plot(ax_main, tspan, errn(idx,:), '-', 'Color', base_colors(idx,:), 'LineWidth', 1.5);
     end
-    plot(ax_main, tspan, 1.5*ones(length(tspan)), '--', 'Color', '#666666', 'LineWidth', 1.0);
+    plot(ax_main, tspan, 1.5*ones(length(tspan)), '--', 'Color', style.neutral.threshold, 'LineWidth', 1.0);
     grid on; box on;
-    set(gca, 'YScale', 'log', 'FontSize', 11, 'FontName', 'Times New Roman');
-    xlabel('Time (s)'); ylabel('$||\boldmath{s}_i - \boldmath{s}_{d,i}||_2$', 'Interpreter','latex');
+    set(gca, 'YScale', 'log', 'FontSize', 14, 'FontName', 'Times New Roman');
+    xlabel('\fontname{宋体}时间\fontname{Times New Roman}/s', 'Interpreter', 'tex', 'FontSize', 14); 
+    ylabel('$||\boldmath{s}_i - \boldmath{s}_{\mathrm{d},i}||_2$', 'Interpreter','latex', 'FontSize', 14);
 
     h1 = scatter(NaN, NaN, markerSize, base_colors(1,:), 'filled', 'MarkerFaceAlpha', 0.6);
     h2 = scatter(NaN, NaN, markerSize, base_colors(2,:), 'filled', 'MarkerFaceAlpha', 0.6);
     h3 = scatter(NaN, NaN, markerSize, base_colors(3,:), 'filled', 'MarkerFaceAlpha', 0.6);
     h4 = scatter(NaN, NaN, markerSize, base_colors(4,:), 'filled', 'MarkerFaceAlpha', 0.6);
 
-    legend([h1,h2,h3,h4], 'Feature 1', 'Feature 2', 'Feature 3', 'Feature 4', ...
-            'FontSize', 10, 'Interpreter', 'latex', 'Location', 'best');
+    legend([h1,h2,h3,h4], '特征点1', '特征点2', '特征点3', '特征点4', ...
+            'FontSize', 12, 'FontName', '宋体', 'Interpreter', 'latex', 'Location', 'best');
 
     % --- Subplot (Inset) ---
     zoom_duration = 50.0; 
@@ -82,9 +84,9 @@ function fig = Plot_feature_error_trajectory(param, hist, k)
         % Fix: plot with correct row vector
         plot(ax_inset, zoom_t, curr_zoom_err, '-', 'Color', base_colors(idx,:), 'LineWidth', 1.0);
     end
-    plot(ax_inset, zoom_t, 1.5*ones(length(zoom_t)), '--', 'Color', '#666666', 'LineWidth', 1.0);
+    plot(ax_inset, zoom_t, 1.5*ones(length(zoom_t)), '--', 'Color', style.neutral.threshold, 'LineWidth', 1.0);
     grid(ax_inset, 'on');
-    set(ax_inset, 'FontSize', 9, 'FontName', 'Times New Roman');
+    set(ax_inset, 'FontSize', 12, 'FontName', 'Times New Roman');
     % Inset usually not recommended for log axis unless error span is huge
     axis(ax_inset, 'tight'); 
     ylim([0,1.6]);

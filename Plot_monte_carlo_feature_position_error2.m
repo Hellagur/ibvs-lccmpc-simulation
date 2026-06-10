@@ -17,13 +17,8 @@ function fig = Plot_monte_carlo_feature_position_error2(path, total_numbers)
                  'PaperOrientation', 'landscape');
     view(2); hold on;
 
-    colors = parula(total_numbers*3);
-    ids = 1;
-    ide = round(total_numbers*2.7);
-    num = round(total_numbers*0.95);
-    colors = [colors(ids:ids+num,:);
-              colors(ide:ide+(total_numbers-num),:)];
-    base_colors = [231, 76, 60; 46, 204, 113; 52, 152, 219; 241, 196, 15] / 255;
+    style = Plot_style();
+    base_colors = style.feature;
     markerSize = 30;
 
     for i = 1:total_numbers
@@ -40,13 +35,14 @@ function fig = Plot_monte_carlo_feature_position_error2(path, total_numbers)
             scatter(tspan(1:5:end), pos_errn(j,1:5:end), markerSize, base_colors(j,:), 'filled', 'MarkerFaceAlpha', 0.35);
         end
     end
-    plot(tspan, 1.5*ones(size(tspan)), '--', 'Color', '#666666', 'LineWidth', 1.0);
+        plot(tspan, 1.5*ones(size(tspan)), '--', 'Color', style.neutral.threshold, 'LineWidth', 1.0);
 
     grid on; axis tight;
-    xlabel('Time (s)', 'FontSize', 12, 'FontName', 'Times New Roman');
-    ylabel('$||\boldmat{s}_i - \boldmat{s}_{d,i}||_2$ (px)', ...
-        'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    set(gca, 'FontSize', 12, 'FontName', 'Times New Roman');
+    xlabel('\fontname{宋体}时间\fontname{Times New Roman}/s', ...
+           'FontSize', 14, 'Interpreter', 'tex');
+    ylabel('$||\boldmath{s}_i - \boldmath{s}_{\mathrm{d},i}||_2$ (px)', ...
+        'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    set(gca, 'FontSize', 14, 'FontName', 'Times New Roman');
     yscale('log');
 
     % Inset
@@ -58,7 +54,7 @@ function fig = Plot_monte_carlo_feature_position_error2(path, total_numbers)
     inset_y = pos(2) + pos(4) - inset_h - 0.04;
     ax_inset = axes('Position', [inset_x, inset_y, inset_w, inset_h]); 
     box on; hold on; grid(ax_inset,'on'); axis(ax_inset,'tight');
-    set(ax_inset, 'FontSize', 10, 'FontName', 'Times New Roman');
+    set(ax_inset, 'FontSize', 12, 'FontName', 'Times New Roman');
 
     for i = 1:total_numbers
         fname   = fullfile(path, [num2str(i), '.mat']);
@@ -80,6 +76,6 @@ function fig = Plot_monte_carlo_feature_position_error2(path, total_numbers)
             scatter(ax_inset, zoom_t(1:2:end), zoom_errn(j,1:2:end), markerSize, base_colors(j,:), 'filled', 'MarkerFaceAlpha', 0.35);
         end
     end
-    plot(zoom_t, 1.5*ones(size(zoom_t)), '--', 'Color', '#666666', 'LineWidth', 1.0);
+        plot(zoom_t, 1.5*ones(size(zoom_t)), '--', 'Color', style.neutral.threshold, 'LineWidth', 1.0);
     ylim([0,1.6]);
 end

@@ -55,10 +55,12 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
     hold(ax_main, 'on'); view(ax_main, 3);
     grid(ax_main, 'on'); axis(ax_main, 'equal');
 
+    style = Plot_style();
+
     % === Define colors ===
-    color_axes  = [1 0 0; 0 1 0; 0 0 1];                % x/y/z axes
-    color_point = [231 76 60; 46 204 113; 52 152 219; 241 196 15]/255; % feature points
-    color_patch = [0 0 1; 204/255 255/255 204/255; 1 0 0];    % feature planes
+    color_axes  = style.axis;          % x/y/z axes
+    color_point = style.feature;       % feature points
+    color_patch = style.state.plane;   % feature planes
     alpha_vals  = linspace(0.3, 0.5, k);                % transparency gradient
 
     % === Plot target axes at start and end timesteps ===
@@ -80,7 +82,7 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
         Plot_arrow3D(pos, pos + 1.5 * z_ls(:,i)', color_axes(3,:), alpha_vals(i));
         % Plot chaser camera model and axes
         Plot_camera_model(pos', hist.R_cl{i}', 15.0);
-        Plot_camera_axes(pos', hist.R_cl{i}', 2.0, [0.2 0.6 1.0], 0.15);
+        Plot_camera_axes(pos', hist.R_cl{i}', 2.0, style.camera.frustum, 0.15);
     end
 
 
@@ -95,7 +97,7 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
 
 
     % === Plot trajectory line ===
-    plot3(r_l(1,:), r_l(2,:), r_l(3,:), 'Color', 'k', 'LineWidth', 1.5);
+    plot3(r_l(1,:), r_l(2,:), r_l(3,:), 'Color', style.neutral.dark, 'LineWidth', 1.5);
 
 
     %% === Plot feature planes and points ===
@@ -119,8 +121,8 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
 
         % Plot target plane
         patch('Parent', ax_main, 'Vertices', xi_l', 'Faces', [1 2 3 4], ...
-              'FaceColor', 'interp', 'FaceVertexCData', repmat(color_patch(idx,:), 4, 1), ...
-              'FaceAlpha', 0.25, 'EdgeColor', 'black');
+        'FaceColor', 'interp', 'FaceVertexCData', repmat(color_patch(idx,:), 4, 1), ...
+        'FaceAlpha', style.state.planeAlpha(idx), 'EdgeColor', style.neutral.dark);
     end
 
 
@@ -132,22 +134,22 @@ function fig = Plot_relative_motion_trajectory(param, hist, k, saveFig)
 
 
     % === Axis labels ===
-    xlabel('$x_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    ylabel('$y_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
-    zlabel('$z_L\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    xlabel('$x_\mathrm{L}\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    ylabel('$y_\mathrm{L}\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
+    zlabel('$z_\mathrm{L}\ (\rm{m})$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter', 'latex');
     set(ax_main, 'FontSize', 12, 'FontName', 'Times New Roman');
 
 
     % === Legend handles ===
-    h_plane_init = patch(NaN, NaN, NaN, [0 0 1], 'FaceAlpha', 0.25, 'EdgeColor', 'black', 'DisplayName', 'Initial Feature Plane');
-    h_plane_medt = patch(NaN, NaN, NaN, [204/255 255/255 204/255], 'FaceAlpha', 0.25, 'EdgeColor', 'black', 'DisplayName', 'Intermediate Feature Planes');
-    h_plane_term = patch(NaN, NaN, NaN, [1 0 0], 'FaceAlpha', 0.25, 'EdgeColor', 'black', 'DisplayName', 'Terminal Feature Plane');
-    h_traj = plot3(NaN, NaN, NaN, '-', 'Color', 'k', 'LineWidth', 1.0, 'DisplayName', 'Relative Trajectory');
-    hx = plot3(NaN, NaN, NaN, 'Color', [1 0 0], 'LineWidth', 2, 'DisplayName', '$\hat{x}$');
-    hy = plot3(NaN, NaN, NaN, 'Color', [0 1 0], 'LineWidth', 2, 'DisplayName', '$\hat{y}$');
-    hz = plot3(NaN, NaN, NaN, 'Color', [0 0 1], 'LineWidth', 2, 'DisplayName', '$\hat{z}$');
+    h_plane_init = patch(NaN, NaN, NaN, color_patch(1,:), 'FaceAlpha', style.state.planeAlpha(1), 'EdgeColor', style.neutral.dark, 'DisplayName', '\fontname{宋体}初始特征点平面');
+    h_plane_medt = patch(NaN, NaN, NaN, color_patch(2,:), 'FaceAlpha', style.state.planeAlpha(2), 'EdgeColor', style.neutral.dark, 'DisplayName', '\fontname{宋体}过程特征点平面');
+    h_plane_term = patch(NaN, NaN, NaN, color_patch(3,:), 'FaceAlpha', style.state.planeAlpha(3), 'EdgeColor', style.neutral.dark, 'DisplayName', '\fontname{宋体}终端特征点平面');
+    h_traj = plot3(NaN, NaN, NaN, '-', 'Color', style.neutral.dark, 'LineWidth', 1.0, 'DisplayName', '\fontname{宋体}相对轨迹');
+    hx = plot3(NaN, NaN, NaN, 'Color', color_axes(1,:), 'LineWidth', 2, 'DisplayName', '\fontname{Times New Roman}x\fontname{宋体}轴');
+    hy = plot3(NaN, NaN, NaN, 'Color', color_axes(2,:), 'LineWidth', 2, 'DisplayName', '\fontname{Times New Roman}y\fontname{宋体}轴');
+    hz = plot3(NaN, NaN, NaN, 'Color', color_axes(3,:), 'LineWidth', 2, 'DisplayName', '\fontname{Times New Roman}z\fontname{宋体}轴');
     legend(ax_main, [h_plane_init, h_plane_medt, h_plane_term, h_traj, hx, hy, hz], ...
-           'Location', 'northeast', 'Interpreter', 'latex', 'FontSize', 10, 'Box', 'on');
+           'Location', 'northeast', 'Interpreter', 'tex', 'FontSize', 10, 'Box', 'on');
 
 
     %% === Inset subplot: Feature point motion ===
@@ -188,10 +190,11 @@ end
 
 function plot_feature_point_motion_subplot(ax, param, hist, k)
     % === Define feature point colors ===
-    color_axes  = [1 0 0; 0 1 0; 0 0 1];
-    color_point = [231 76 60; 46 204 113; 52 152 219; 241 196 15]/255;
-    color_patch = [0 0 1; 204/255 255/255 204/255; 1 0 0];
-    color_edge  = [0 0 1; 102/255 255/255 153/255; 1 0 0];
+    style = Plot_style();
+    color_axes  = style.axis;
+    color_point = style.feature;
+    color_patch = style.state.plane;
+    color_edge  = style.state.plane;
     alpha_vals  = linspace(0.3, 0.5, k);
 
 
@@ -220,7 +223,7 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
 
 
     % plot plane center trajectory
-    plot3(ave_xi(1,:), ave_xi(2,:), ave_xi(3,:), 'k--', 'LineWidth', 1.0);
+    plot3(ave_xi(1,:), ave_xi(2,:), ave_xi(3,:), 'Color', style.neutral.dark, 'LineStyle', '--', 'LineWidth', 1.0);
 
 
     % === draw direction arrows ===
@@ -235,7 +238,7 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
     quiver3(ave_xi(1,idx), ave_xi(2,idx), ave_xi(3,idx), ...
             dx(idx), dy(idx), dz(idx), ...
             0.5, ...              % Scale factor (0 means no auto-scaling)
-            'k', ...
+            'Color', style.neutral.dark, ...
             'LineWidth', 1.2, ...
             'MaxHeadSize', 1.0);
 
@@ -263,7 +266,7 @@ function plot_feature_point_motion_subplot(ax, param, hist, k)
               'Faces', [1 2 3 4], ...
               'FaceColor', 'interp', ...
               'FaceVertexCData', repmat(color_patch(idx,:), 4, 1), ...
-              'FaceAlpha', 0.25, 'EdgeColor', 'black');
+        'FaceAlpha', style.state.planeAlpha(idx), 'EdgeColor', style.neutral.dark);
         
         % plot plane center
         scatter3(ax, ave_xi(1,i), ave_xi(2,i), ave_xi(3,i), 30, ...
@@ -317,7 +320,8 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
 
 
     % === Define colors for axes ===
-    colorX = [1 0 0]; colorY = [0 1 0]; colorZ = [0 0 1];
+    style = Plot_style();
+    colorX = style.axis(1,:); colorY = style.axis(2,:); colorZ = style.axis(3,:);
 
 
     % === Plot target axes at LVLH origin ===
@@ -336,7 +340,7 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
 
     % Plot chaser camera and its axes
     Plot_camera_model(start', hist.R_cl{idx}', 15.0);
-    Plot_camera_axes(start', hist.R_cl{idx}', 2.0, [0.2 0.6 1.0], 0.15);
+    Plot_camera_axes(start', hist.R_cl{idx}', 2.0, style.camera.frustum, 0.15);
     
     
     % === Plot camera body axes at its position ===
@@ -356,15 +360,16 @@ function plot_inset_state(ax, param, hist, r_l, r_c, x_lt, y_lt, z_lt, x_ls, y_l
 
 
     % === Plot target feature plane ===
-    % Color red for terminal, blue for non-terminal
+    plane_idx = 1 + 2*is_terminal;
+    plane_color = style.state.plane(plane_idx,:);
     patch('Parent', ax, 'Vertices', xi, 'Faces', [1 2 3 4], ...
-          'FaceColor', 'interp', ...
-          'FaceVertexCData', repmat(is_terminal * [1 0 0] + ~is_terminal * [0 0 1], 4, 1), ...
-          'FaceAlpha', 0.25, 'EdgeColor', 'black');
+        'FaceColor', 'interp', ...
+        'FaceVertexCData', repmat(plane_color, 4, 1), ...
+        'FaceAlpha', style.state.planeAlpha(plane_idx), 'EdgeColor', style.neutral.dark);
 
 
     % === Plot feature points and connecting lines to chaser ===
-    color_set = [[231 76 60]/255; [46 204 113]/255; [52 152 219]/255; [241 196 15]/255];
+    color_set = style.feature;
     marker_style = 'o';  % marker shape for feature points
 
 

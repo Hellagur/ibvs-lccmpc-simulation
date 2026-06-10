@@ -51,7 +51,7 @@ fis = addRule(fis, rules);
 writeFIS(fis, 'gamma_adjuster.fis');
 
 %% Plotting
-showplot = false;
+showplot = true;
 
 %% Plotting
 if showplot
@@ -76,8 +76,8 @@ if showplot
     plot(x, mu_M, 'LineWidth', 1.5);
     plot(x, mu_H, 'LineWidth', 1.5);
     
-    xlabel('$S_v$', 'Interpreter','latex');
-    ylabel('Degree of Membership');
+    xlabel('$S_\mathrm{v}$', 'Interpreter','latex');
+    ylabel('\fontname{宋体}隶属度', 'Interpreter','tex');
     
     legend({'Low','Medium','High'}, ...
         'Location','NorthWest', ...
@@ -101,8 +101,8 @@ if showplot
     plot(x, mu_M, 'LineWidth', 1.5);
     plot(x, mu_H, 'LineWidth', 1.5);
     
-    xlabel('$S_\omega$', 'Interpreter','latex');
-    ylabel('Degree of Membership');
+    xlabel('$S_\mathrm{\omega}$', 'Interpreter','latex');
+    ylabel('\fontname{宋体}隶属度', 'Interpreter','tex');
     
     legend({'Low','Medium','High'}, ...
         'Location','NorthWest', ...
@@ -121,7 +121,7 @@ if showplot
     gensurf(fis);  % View output surface (3D plot, check smoothness)
     set(gca, ...
         'FontName', 'Times New Roman', ...
-        'FontSize', 12, ...
+        'FontSize', 14, ...
         'TickLabelInterpreter', 'latex');
 end
 
@@ -147,8 +147,8 @@ if showplot
 
     view(135, 30);
     
-    xlabel('$S_v$', 'Interpreter','latex');
-    ylabel('$S_\omega$', 'Interpreter','latex');
+    xlabel('$S_\mathrm{v}$', 'Interpreter','latex');
+    ylabel('$S_\mathrm{\omega}$', 'Interpreter','latex');
     zlabel('$\gamma$', 'Interpreter','latex');
     
     set(gca, ...

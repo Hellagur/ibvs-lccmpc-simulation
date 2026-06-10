@@ -13,6 +13,7 @@ function fig = Plot_accumulated_energy_compare(file1, file2, file3)
 % Outputs:
 %   fig - figure handle
 
+    style = Plot_style();
     data1 = load(file1);
     hist1 = data1.hist;
     param = data1.param;
@@ -53,30 +54,28 @@ function fig = Plot_accumulated_energy_compare(file1, file2, file3)
     end
 
 
-    base_colors = [231, 76, 60; 46, 204, 113; 52, 152, 219] / 255;
-
-
     fig = figure('Units','inches','Position',[1 1 8 6]);
     hold on;
 
 
     area(tspan, energy2, 'LineWidth', 2.0, ...
-        'FaceColor', base_colors(2,:), 'EdgeColor', base_colors(3,:), ...
-        'FaceAlpha', 0.36, 'DisplayName', '$\gamma \equiv 0$', 'LineStyle','-');
+        'FaceColor', style.method.gamma0, 'EdgeColor', style.method.gamma0, ...
+        'FaceAlpha', 0.30, 'DisplayName', '$\gamma \equiv 0$', 'LineStyle', style.methodLine.gamma0);
 
     area(tspan, energy3, 'LineWidth', 2.0, ...
-        'FaceColor', base_colors(3,:), 'EdgeColor', base_colors(3,:), ...
-        'FaceAlpha', 0.36, 'DisplayName', '$\gamma \equiv 1$', 'LineStyle','--');
+        'FaceColor', style.method.gamma1, 'EdgeColor', style.method.gamma1, ...
+        'FaceAlpha', 0.30, 'DisplayName', '$\gamma \equiv 1$', 'LineStyle', style.methodLine.gamma1);
     
     area(tspan, energy1, 'LineWidth', 2.0, ...
-        'FaceColor', base_colors(1,:), 'EdgeColor', base_colors(1,:), ...
-        'FaceAlpha', 0.36, 'DisplayName', '$\gamma$ Adaptive', 'LineStyle','-.');
+        'FaceColor', style.method.adaptive, 'EdgeColor', style.method.adaptive, ...
+        'FaceAlpha', 0.30, 'DisplayName', '$\gamma$ Adaptive', 'LineStyle', style.methodLine.adaptive);
 
 
     grid on; axis tight;
     ylim([0, max([energy1(end), energy2(end), energy3(end)])+4.0]);
-    xlabel('Time (s)', 'FontSize', 12, 'FontName', 'Times New Roman');
-    ylabel('$\sum||\boldmath{u}||_2$', 'FontSize', 12, 'FontName', 'Times New Roman', 'Interpreter','latex');
-    legend('Interpreter', 'latex', 'Location', 'northwest', 'FontSize', 10);
-    set(gca, 'FontName', 'Times New Roman', 'FontSize', 12);
+    xlabel('\fontname{宋体}时间\fontname{Times New Roman}/s', ...
+           'FontSize', 14, 'Interpreter', 'tex');
+    ylabel('$\sum||\boldmath{u}||_2$', 'FontSize', 14, 'FontName', 'Times New Roman', 'Interpreter','latex');
+    legend('Interpreter', 'latex', 'Location', 'northwest', 'FontSize', 12);
+    set(gca, 'FontName', 'Times New Roman', 'FontSize', 14);
 end

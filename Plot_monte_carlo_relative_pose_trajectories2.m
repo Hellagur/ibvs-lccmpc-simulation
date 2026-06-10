@@ -15,12 +15,14 @@ addParameter(p, 'saveFig', false, @islogical);
 parse(p, varargin{:});
 saveFig = p.Results.saveFig;
 
+style = Plot_style();
+
 % Create figure
 fig = figure('Units','inches','Position',[1 1 8 6]);
 Nc = total_numbers*5;
 
 gamma = 0.55;
-map = sky(Nc);
+map = style.mcPoseCmap(Nc);
 idx = round(1 + (Nc-1) * linspace(0,1,total_numbers).^gamma);
 colors = map(idx, :);
 
@@ -67,19 +69,11 @@ for i = 1:total_numbers
     
     % Plot
     subplot(211);
-    plot(tspan, r_ct_tn, 'Color', colors(i,:), 'LineStyle', '-', 'LineWidth', 1.0);
+    plot_transparent_line(gca, tspan, r_ct_tn, colors(i,:), style.mcPoseAlpha, 0.9);
     
     subplot(212);
-    plot(tspan, s_ctn, 'Color', colors(i,:), 'LineStyle', '-', 'LineWidth', 1.0);
+    plot_transparent_line(gca, tspan, s_ctn, colors(i,:), style.mcPoseAlpha, 0.9);
 end
-
-% Subplot 1 settings
-subplot(211);
-xlabel('Time (s)', 'FontSize', 12, 'FontName', 'Times New Roman');
-ylabel('$||\boldmath{\rho}_{TC}-\boldmath{\rho}_{TC}^*||_2$ (m)', 'FontSize', 12, ...
-'FontName', 'Times New Roman', 'Interpreter','latex');
-grid on; axis tight;
-set(gca, 'FontSize', 12, 'FontName', 'Times New Roman');
 
 % ---- Determine zoom-in range (last 50 seconds) ----
 zoom_duration = 40.0;
@@ -87,22 +81,23 @@ zoom_duration = 40.0;
 zoom_t = tspan(zoom_start_idx:end);
 % ---- Subplot 1 settings ----
 subplot(211);
-xlabel('Time (s)', 'FontSize', 12, 'FontName', 'Times New Roman');
-ylabel('$||\boldmath{\rho}_{TC}-\boldmath{\rho}_{TC}^*||_2$ (m)', 'FontSize', 12, ...
+xlabel('\fontname{宋体}时间\fontname{Times New Roman}/s', ...
+           'FontSize', 14, 'Interpreter', 'tex');
+ylabel('$||\boldmath{\rho}_{\mathrm{TC}}-\boldmath{\rho}_{\mathrm{TC}}^*||_2$ (m)', 'FontSize', 14, ...
 'FontName', 'Times New Roman', 'Interpreter','latex');
 grid on; axis tight;
 ylim([min(cellfun(@(x) min(x(:)), r_ct_t_all))-1, max(cellfun(@(x) max(x(:)), r_ct_t_all))+1]);
-set(gca, 'FontSize', 12, 'FontName', 'Times New Roman');
+set(gca, 'FontSize', 14, 'FontName', 'Times New Roman');
 % Inset for x,y
 idx1 = 421:461;
 zoom_t1 = tspan(idx1);
 ax_inset_xy = axes('Position', [0.69, 0.79, 0.15, 0.10]); hold on; box on;
 for i = 1:total_numbers
     r_ct_tn = r_ct_t_all{i};
-    plot(zoom_t1, r_ct_tn(idx1), 'Color', colors(i,:), 'LineStyle', '-', 'LineWidth', 1.0);
+    plot_transparent_line(ax_inset_xy, zoom_t1, r_ct_tn(idx1), colors(i,:), style.mcPoseInsetAlpha, 0.9);
 end
-plot(zoom_t1, 0.02*ones(size(zoom_t1)), 'Color', '#666666', 'LineStyle', '--', 'LineWidth', 1.0);
-set(ax_inset_xy,'FontSize',10,'FontName','Times New Roman');
+plot(zoom_t1, 0.02*ones(size(zoom_t1)), 'Color', style.neutral.threshold, 'LineStyle', '--', 'LineWidth', 1.0);
+set(ax_inset_xy,'FontSize',12,'FontName','Times New Roman');
 ax_inset_xy.YAxis.Exponent = 0; % Disable scientific notation
 grid on; axis tight;
 xlim([zoom_t1(1), zoom_t1(end)]);
@@ -111,28 +106,29 @@ ylim([-0.01,0.03]);
 ax_inset_z = axes('Position', [0.69, 0.64, 0.15, 0.10]); hold on; box on;
 for i = 1:total_numbers
     r_ct_tn = r_ct_t_all{i};
-    plot(zoom_t, r_ct_tn(zoom_start_idx:end), 'Color', colors(i,:), 'LineStyle', '-', 'LineWidth', 1.0);
+    plot_transparent_line(ax_inset_z, zoom_t, r_ct_tn(zoom_start_idx:end), colors(i,:), style.mcPoseInsetAlpha, 0.9);
 end
-set(ax_inset_z,'FontSize',10,'FontName','Times New Roman');
+set(ax_inset_z,'FontSize',12,'FontName','Times New Roman');
 ax_inset_z.YAxis.Exponent = 0;
 % title('$$z_T$$', 'Interpreter', 'latex', 'FontSize', 10);
 grid on; axis tight;
 
 % Subplot 2 settings
 subplot(212);
-xlabel('Time (s)', 'FontSize', 12, 'FontName', 'Times New Roman');
-ylabel('$$||\boldmath{\sigma}_{CT}||_2$$ (MRPs)', 'FontSize', 12, ...
+xlabel('\fontname{宋体}时间\fontname{Times New Roman}/s', ...
+           'FontSize', 14, 'Interpreter', 'tex');
+ylabel('$$||\boldmath{\sigma}_{\mathrm{CT}}||_2$$ (MRPs)', 'FontSize', 14, ...
 'FontName', 'Times New Roman', 'Interpreter','latex');
 grid on; axis tight;
-set(gca, 'FontSize', 12, 'FontName', 'Times New Roman');
+set(gca, 'FontSize', 14, 'FontName', 'Times New Roman');
 
 ax_inset_att1 = axes('Position', [0.69, 0.30, 0.15, 0.10]); hold on; box on;
 for i = 1:total_numbers
     s_ctn = s_ct_all{i};
-    plot(zoom_t1, s_ctn(idx1), 'Color', colors(i,:), 'LineStyle', '-', 'LineWidth', 1.0);
+    plot_transparent_line(ax_inset_att1, zoom_t1, s_ctn(idx1), colors(i,:), style.mcPoseInsetAlpha, 0.9);
 end
-plot(zoom_t1, 0.01*ones(size(zoom_t1)), 'Color', '#666666', 'LineStyle', '--', 'LineWidth', 1.0);
-set(ax_inset_att1,'FontSize',10,'FontName','Times New Roman');
+plot(zoom_t1, 0.01*ones(size(zoom_t1)), 'Color', style.neutral.threshold, 'LineStyle', '--', 'LineWidth', 1.0);
+set(ax_inset_att1,'FontSize',12,'FontName','Times New Roman');
 ax_inset_att1.YAxis.Exponent = 0; % Disable scientific notation
 grid on; axis tight;
 xlim([zoom_t1(1), zoom_t1(end)]);
@@ -140,18 +136,33 @@ ylim([-0.01,0.05]);
 ax_inset_att = axes('Position', [0.69, 0.15, 0.15, 0.10]); hold on; box on;
 for i = 1:total_numbers
     s_ctn = s_ct_all{i};
-    plot(zoom_t, s_ctn(zoom_start_idx:end), 'Color', colors(i,:), 'LineStyle', '-', 'LineWidth', 1.0);
+    plot_transparent_line(ax_inset_att, zoom_t, s_ctn(zoom_start_idx:end), colors(i,:), style.mcPoseInsetAlpha, 0.9);
 end
-set(ax_inset_att,'FontSize',10,'FontName','Times New Roman');
+set(ax_inset_att,'FontSize',12,'FontName','Times New Roman');
 ax_inset_att.YAxis.Exponent = 0;
 grid on; axis tight;
 
 % Export figure if requested
 if saveFig
     set(gcf, 'PaperPositionMode', 'auto');
-    set(gcf, 'Renderer', 'painters');
+    set(gcf, 'Renderer', 'opengl');
     figure_name = strcat('figs/relative_pose_trajectories_duration=', ...
                          num2str((param.Tsteps)*param.ts), 's');
     print(fig, figure_name, '-dpdf', '-r600');
 end
+end
+
+function h = plot_transparent_line(ax, x, y, color, alpha, lineWidth)
+    x = x(:).';
+    y = y(:).';
+    z = zeros(size(x));
+
+    h = surface(ax, ...
+        'XData', [x; x], ...
+        'YData', [y; y], ...
+        'ZData', [z; z], ...
+        'FaceColor', 'none', ...
+        'EdgeColor', color, ...
+        'EdgeAlpha', alpha, ...
+        'LineWidth', lineWidth);
 end

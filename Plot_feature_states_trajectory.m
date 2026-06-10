@@ -14,6 +14,7 @@ function Plot_feature_states_trajectory(param, hist, k, saveFig)
 % Outputs:
 %   None (displays figure)
 
+    style = Plot_style();
     fig = figure('Units','inches','Position',[1 1 8 6]);
 
     % Background grid
@@ -23,23 +24,23 @@ function Plot_feature_states_trajectory(param, hist, k, saveFig)
     hold on;
     
     for y = y_range
-        line([-param.um, param.um], [y, y], 'Color', [0.85 0.85 0.85], 'LineWidth', 0.6);
+        line([-param.um, param.um], [y, y], 'Color', style.neutral.grid, 'LineWidth', 0.6);
     end
     for x = x_range
-        line([x, x], [-param.nm, param.nm], 'Color', [0.85 0.85 0.85], 'LineWidth', 0.6);
+        line([x, x], [-param.nm, param.nm], 'Color', style.neutral.grid, 'LineWidth', 0.6);
     end
     
-    set(gca, 'Color', [0.99 0.99 0.99]);  
+    set(gca, 'Color', style.neutral.bg);  
     box on;
     
-    line([0 0], [-param.nm, param.nm], 'Color', [0.4 0.4 0.4], 'LineStyle', ':');
-    line([-param.um, param.um], [0 0], 'Color', [0.4 0.4 0.4], 'LineStyle', ':');
+    line([0 0], [-param.nm, param.nm], 'Color', style.neutral.axis, 'LineStyle', ':');
+    line([-param.um, param.um], [0 0], 'Color', style.neutral.axis, 'LineStyle', ':');
 
     line('XData', [param.sd(1:2:7);param.sd(1)], ...
          'YData', [param.sd(2:2:8);param.sd(2)], ...
          'LineStyle','--','LineWidth',1.5);
 
-    base_colors = [231, 76,  60; 46,  204, 113; 52, 152, 219; 241, 196, 15] / 255;
+    base_colors = style.feature;
 
     markerSize = 50;
     for idx = 1:4
@@ -56,7 +57,7 @@ function Plot_feature_states_trajectory(param, hist, k, saveFig)
     %% ---- Plot line ----
     num = 1024;
     gamma = 0.5;
-    map = turbo(num);
+    map = style.cmap(num);
     idx = round(1 + (num-1) * linspace(0,1,k).^gamma);
     colors_l = map(idx, :);
     
@@ -70,30 +71,30 @@ function Plot_feature_states_trajectory(param, hist, k, saveFig)
     %% ---- Plot desired positions ----
     for i = 1:4
         p0 = plot(param.sd(2*i-1), param.sd(2*i), 'p', ...
-             'MarkerFaceColor','#FF9966','MarkerEdgeColor','k','MarkerSize',11);
+             'MarkerFaceColor',style.state.desired,'MarkerEdgeColor',style.neutral.dark,'MarkerSize',11);
     end
     
     %% ---- Plot initial positions ----
     for i = 1:4
         p2 = plot(hist.xs(2*i-1,1), hist.xs(2*i,1), 'o', ...
-             'MarkerFaceColor','none','MarkerEdgeColor','r','MarkerSize',6,'LineWidth',1.5);
+             'MarkerFaceColor','none','MarkerEdgeColor',style.state.initial,'MarkerSize',6,'LineWidth',1.5);
     end
     
     %% ---- Plot final positions ----
     for i = 1:4
         p3 = plot(hist.xs(2*i-1,k), hist.xs(2*i,k), 'o', ...
-             'MarkerFaceColor','none','MarkerEdgeColor','g','MarkerSize',6,'LineWidth',1.5);
+             'MarkerFaceColor','none','MarkerEdgeColor',style.state.terminal,'MarkerSize',6,'LineWidth',1.5);
     end
 
     axis equal;
     xlim([-param.um, param.um]);
     ylim([-param.nm, param.nm]);
-    xlabel('$u\ (\rm{px})$', 'FontSize',12,'FontName','Times New Roman','Interpreter','latex');
-    ylabel('$v\ (\rm{px})$', 'FontSize',12,'FontName','Times New Roman','Interpreter','latex');
-    set(gca,'FontSize',12,'FontName','Times New Roman');
+    xlabel('$u\ (\rm{px})$', 'FontSize',14,'FontName','Times New Roman','Interpreter','latex');
+    ylabel('$v\ (\rm{px})$', 'FontSize',14,'FontName','Times New Roman','Interpreter','latex');
+    set(gca,'FontSize',14,'FontName','Times New Roman');
 
-    legend([p3, p2, p0], {'Final Position','Initial Position','Target Position'}, ...
-           'FontSize',12,'FontName','Times New Roman','Location','northeast');
+    legend([p3, p2, p0], {'终端位置','初始位置','期望位置'}, ...
+           'FontSize',12,'FontName','宋体','Location','northeast');
 
     if saveFig
         set(gcf, 'PaperPositionMode','auto');

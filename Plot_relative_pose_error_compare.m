@@ -13,6 +13,7 @@ function fig = Plot_relative_pose_error_compare(file1, file2, file3)
 % Outputs:
 %   fig - figure handle
 
+    style = Plot_style();
     data1 = load(file1);
     hist1 = data1.hist;
     param = data1.param;
@@ -100,29 +101,30 @@ function fig = Plot_relative_pose_error_compare(file1, file2, file3)
 
     %% Position
     subplot(211); hold on;
-    plot(tspan, r_ct_tn1, 'r', 'DisplayName', '$\gamma$ Adaptive', 'LineWidth', 1.5);
-    plot(tspan, r_ct_tn3, 'b--', 'DisplayName', '$\gamma \equiv 1$', 'LineWidth', 1.5);
-    plot(tspan, r_ct_tn2, 'k-.', 'DisplayName', '$\gamma \equiv 0$', 'LineWidth', 1.5);
+    plot(tspan, r_ct_tn1, 'Color', style.method.adaptive, 'LineStyle', style.methodLine.adaptive, 'DisplayName', '$\gamma$ Adaptive', 'LineWidth', 1.5);
+    plot(tspan, r_ct_tn2, 'Color', style.method.gamma0, 'LineStyle', style.methodLine.gamma0, 'DisplayName', '$\gamma \equiv 0$', 'LineWidth', 1.5);
+    plot(tspan, r_ct_tn3, 'Color', style.method.gamma1, 'LineStyle', style.methodLine.gamma1, 'DisplayName', '$\gamma \equiv 1$', 'LineWidth', 1.5);
     grid on; axis tight;
-    xlabel('Time (s)', 'FontSize', 12, 'FontName', 'Times New Roman');
-    ylabel('$||\boldmath{\rho}_{TC} - \boldmath{\rho}_{TC}^*||_2$ (m)', 'FontSize', 12, ...
+    xlabel('\fontname{宋体}时间\fontname{Times New Roman}/s', ...
+           'FontSize', 14, 'Interpreter', 'tex');
+    ylabel('$||\boldmath{\rho}_{\mathrm{TC}} - \boldmath{\rho}_{\mathrm{TC}}^*||_2$ (m)', 'FontSize', 14, ...
            'FontName', 'Times New Roman', 'Interpreter','latex');
-    legend('Interpreter', 'latex', 'Location', 'northeast', 'FontSize', 10);
-    set(gca, 'FontName', 'Times New Roman', 'FontSize', 12);
+    legend('Interpreter', 'latex', 'Location', 'northeast', 'FontSize', 12);
+    set(gca, 'FontName', 'Times New Roman', 'FontSize', 14);
 
     % Inset for x,y
     zoom_idx1 = 141:221;
     zoom_t1 = tspan(zoom_idx1);
     
     ax_inset_xy = axes('Position', [0.38, 0.64, 0.20, 0.10]); hold on; box on;
-    plot(zoom_t1, r_ct_tn1(zoom_idx1), 'r-', 'LineWidth', 1.5);
-    plot(zoom_t1, r_ct_tn2(zoom_idx1), 'k-.', 'LineWidth', 1.5);
-    plot(zoom_t1, 0.02*ones(size(zoom_t1)), 'Color', '#666666', 'LineWidth', 1.0, 'LineStyle', '--');
-    % plot(zoom_t1, 4.99*ones(size(zoom_t1)), 'Color', '#666666', 'LineWidth', 1.0, 'LineStyle', '--');
-    set(gca,'FontSize',10,'FontName','Times New Roman');
+    plot(zoom_t1, r_ct_tn1(zoom_idx1), 'Color', style.method.adaptive, 'LineStyle', style.methodLine.adaptive, 'LineWidth', 1.5);
+    plot(zoom_t1, r_ct_tn2(zoom_idx1), 'Color', style.method.gamma0, 'LineStyle', style.methodLine.gamma0, 'LineWidth', 1.5);
+    plot(zoom_t1, 0.02*ones(size(zoom_t1)), 'Color', style.neutral.threshold, 'LineWidth', 1.0, 'LineStyle', '--');
+    % plot(zoom_t1, 4.99*ones(size(zoom_t1)), 'Color', style.neutral.threshold, 'LineWidth', 1.0, 'LineStyle', '--');
+    set(gca,'FontSize',12,'FontName','Times New Roman');
     ax_inset_xy.YAxis.Exponent = 0;  % Disable scientific notation
     grid on; axis tight;
-    xticks(70:10:110);
+    xticks(70:15:110);
     yticks(0:0.02:0.05);
     ylim([0,0.05])
 
@@ -132,44 +134,45 @@ function fig = Plot_relative_pose_error_compare(file1, file2, file3)
     zoom_t = tspan(zoom_start_idx:end);
     
     ax_inset_xyz = axes('Position', [0.65, 0.64, 0.20, 0.10]); hold on; box on;
-    plot(zoom_t, r_ct_tn1(zoom_start_idx:end), 'r-', 'LineWidth', 1.5);
-    plot(zoom_t, r_ct_tn2(zoom_start_idx:end), 'k-.', 'LineWidth', 1.5);
-    plot(zoom_t, r_ct_tn3(zoom_start_idx:end), 'b--', 'LineWidth', 1.5);
-    set(gca,'FontSize',10,'FontName','Times New Roman');
+    plot(zoom_t, r_ct_tn1(zoom_start_idx:end), 'Color', style.method.adaptive, 'LineStyle', style.methodLine.adaptive, 'LineWidth', 1.5);
+    plot(zoom_t, r_ct_tn2(zoom_start_idx:end), 'Color', style.method.gamma0, 'LineStyle', style.methodLine.gamma0, 'LineWidth', 1.5);
+    plot(zoom_t, r_ct_tn3(zoom_start_idx:end), 'Color', style.method.gamma1, 'LineStyle', style.methodLine.gamma1, 'LineWidth', 1.5);
+    set(gca,'FontSize',12,'FontName','Times New Roman');
     ax_inset_xyz.YAxis.Exponent = 0;
     grid on; axis tight;
 
 
     %% Attitude
     subplot(212); hold on;
-    plot(tspan, s_ctn1, 'r', 'DisplayName', '$\gamma$ Adaptive', 'LineWidth', 1.5);
-    plot(tspan, s_ctn3, 'b--', 'DisplayName', '$\gamma \equiv 1$', 'LineWidth', 1.5);
-    plot(tspan, s_ctn2, 'k-.', 'DisplayName', '$\gamma \equiv 0$', 'LineWidth', 1.5);
+    plot(tspan, s_ctn1, 'Color', style.method.adaptive, 'LineStyle', style.methodLine.adaptive, 'DisplayName', '$\gamma$ Adaptive', 'LineWidth', 1.5);
+    plot(tspan, s_ctn2, 'Color', style.method.gamma0, 'LineStyle', style.methodLine.gamma0, 'DisplayName', '$\gamma \equiv 0$', 'LineWidth', 1.5);
+    plot(tspan, s_ctn3, 'Color', style.method.gamma1, 'LineStyle', style.methodLine.gamma1, 'DisplayName', '$\gamma \equiv 1$', 'LineWidth', 1.5);
     grid on; axis tight;
-    xlabel('Time (s)', 'FontSize', 12, 'FontName', 'Times New Roman');
-    ylabel('$||\mathbf{\sigma}_{CT}||_2$ (MRPs)', 'FontSize', 12, ...
+    xlabel('\fontname{宋体}时间\fontname{Times New Roman}/s', ...
+           'FontSize', 14, 'Interpreter', 'tex');
+    ylabel('$||\mathbf{\sigma}_{\mathrm{CT}}||_2$ (MRPs)', 'FontSize', 14, ...
            'FontName', 'Times New Roman', 'Interpreter','latex');
-    legend('Interpreter', 'latex', 'Location', 'northeast', 'FontSize', 10);
-    set(gca, 'FontName', 'Times New Roman', 'FontSize', 12);
+    legend('Interpreter', 'latex', 'Location', 'northeast', 'FontSize', 12);
+    set(gca, 'FontName', 'Times New Roman', 'FontSize', 14);
 
     % Inset for x,y
     ax_inset_xy = axes('Position', [0.38, 0.22, 0.20, 0.10]); hold on; box on;
-    plot(zoom_t1, s_ctn1(zoom_idx1), 'r-', 'LineWidth', 1.5);
-    plot(zoom_t1, s_ctn2(zoom_idx1), 'k-.', 'LineWidth', 1.5);
-    plot(zoom_t1,  0.01*ones(size(zoom_t1)), 'Color', '#666666', 'LineWidth', 1.0, 'LineStyle', '--');
-    set(gca,'FontSize',10,'FontName','Times New Roman');
+    plot(zoom_t1, s_ctn1(zoom_idx1), 'Color', style.method.adaptive, 'LineStyle', style.methodLine.adaptive, 'LineWidth', 1.5);
+    plot(zoom_t1, s_ctn2(zoom_idx1), 'Color', style.method.gamma0, 'LineStyle', style.methodLine.gamma0, 'LineWidth', 1.5);
+    plot(zoom_t1,  0.01*ones(size(zoom_t1)), 'Color', style.neutral.threshold, 'LineWidth', 1.0, 'LineStyle', '--');
+    set(gca,'FontSize',12,'FontName','Times New Roman');
     ax_inset_xy.YAxis.Exponent = 0;  % Disable scientific notation
     grid on; axis tight;
-    xticks(70:10:110);
+    xticks(70:15:110);
     yticks(0:0.02:0.05);
     ylim([-0.01,0.05])
 
     % Inset for x,y,z
     ax_inset_xyz = axes('Position', [0.65, 0.22, 0.20, 0.10]); hold on; box on;
-    plot(zoom_t, s_ctn1(zoom_start_idx:end), 'r-', 'LineWidth', 1.5);
-    plot(zoom_t, s_ctn2(zoom_start_idx:end), 'k-.', 'LineWidth', 1.5);
-    plot(zoom_t, s_ctn3(zoom_start_idx:end), 'b--', 'LineWidth', 1.5);
-    set(gca,'FontSize',10,'FontName','Times New Roman');
+    plot(zoom_t, s_ctn1(zoom_start_idx:end), 'Color', style.method.adaptive, 'LineStyle', style.methodLine.adaptive, 'LineWidth', 1.5);
+    plot(zoom_t, s_ctn2(zoom_start_idx:end), 'Color', style.method.gamma0, 'LineStyle', style.methodLine.gamma0, 'LineWidth', 1.5);
+    plot(zoom_t, s_ctn3(zoom_start_idx:end), 'Color', style.method.gamma1, 'LineStyle', style.methodLine.gamma1, 'LineWidth', 1.5);
+    set(gca,'FontSize',12,'FontName','Times New Roman');
     ax_inset_xyz.YAxis.Exponent = 0;
     grid on; axis tight;
     yticks(0.01:0.04:0.13);
